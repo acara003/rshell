@@ -13,6 +13,9 @@
 
 using namespace std;
 
+//execute command.
+void execute(string s);
+
 int main()
 {
 
@@ -70,9 +73,54 @@ int main()
         if(input == "exit")
             exit(0);
 
+        //execute command.
+        execute(input);
+
     }
     
     cout << "End of program" << endl;
    
     return 0;
 }
+
+void execute(string s)
+{
+    char* args[2048];
+    
+    args[0] = (char*)s.c_str();
+    args[1] = NULL;
+
+    pid_t pid = fork();
+
+    if(pid == -1)
+    {
+        //fork didn't work.
+        perror("fork");
+    }
+    if(pid ==0)
+    {
+        if(execvp(args[0], args) == -1)
+        {
+            //execute didn't work.
+            perror("execvp");
+            
+            //break out of shadow realm.
+            exit(1);
+        }
+
+    }
+    if(pid > 0)
+    {
+        //wait for child to die.
+        if(wait(0) == -1)
+        {
+            //didnt wait.
+            perror("wait");
+        }
+    }
+   
+    return;
+}
+
+
+
