@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <string>
 
 //getlogin() and gethostname().
 #include <unistd.h>
@@ -31,6 +32,9 @@ vector<string> parseInput(string s);
 
 //display vector.
 void display_vector(vector<string> v);
+
+//removes comment from input.
+void remove_comment(string &s);
 
 int main()
 {
@@ -87,15 +91,26 @@ int main()
 
         //geting input as a string.
         getline(cin,input);
-        cout << input << endl;
+
+        //remove comments.
+        cout << "Before: " << input << endl;
+
+        //remove extra white space.
+        trim(input);
+
+        remove_comment(input);
+        cout << "After: " << input << endl;        
+        
+        //trim again just in case.
+        trim(input);
 
         //break.
         if(input == "exit")
             exit(0);
         
         //testing parse.
-        cout << "Testing parse" << endl;
-        display_vector(parseInput(input));
+        //cout << "Testing parse" << endl;
+        //display_vector(parseInput(input));
 
         //execute command.
         //execute(input);
@@ -176,6 +191,38 @@ void display_vector(vector<string> v)
         cout << i+1 << ": " << v.at(i) << endl;
     return;
 }
+
+void remove_comment(string &s)
+{
+    //delete everything!
+    if(s.find("#") == 0)
+    {
+        s = "";
+        return;
+    }
+
+    //return if no comments.
+    if(s.find("#") == string::npos)
+    {
+        return;
+    }
+
+    //if no comments then delets everything from hash forward.
+    if(s.find("\"") == string::npos && s.find("#") != string::npos)
+    {
+        s = s.substr(0,s.find("#"));
+        return;
+    }
+
+    if(s.find("\"") > s.find("#"))
+    {
+        s = s.substr(0,s.find("#"));
+        return;
+    }
+
+    return;
+}
+
 
 
 
