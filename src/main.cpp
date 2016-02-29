@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 
 //getlogin() and gethostname().
 #include <unistd.h>
@@ -11,10 +12,25 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+//boost!
+#include "boost/algorithm/string.hpp"
+#include "boost/tokenizer.hpp"
+#include "boost/foreach.hpp"
+
+//that one class.
+#include "Command.h"
+
 using namespace std;
+using namespace boost;
 
 //execute command.
 void execute(string s);
+
+//takes a string and returns vector of parsed string.
+vector<string> parseInput(string s);
+
+//display vector.
+void display_vector(vector<string> v);
 
 int main()
 {
@@ -50,6 +66,7 @@ int main()
         perror("Error: could not rerieve host name.");
     }
 
+    //warn user of upcoming trouble.
     if(login_check == false || host_check == false)
         cout << "Unable to display login and/or host information." << endl;
     
@@ -65,6 +82,9 @@ int main()
         //bash money.
         cout << "$ ";    
 
+        //placeholder to tell its the program.
+        cout << " (program) ";
+
         //geting input as a string.
         getline(cin,input);
         cout << input << endl;
@@ -72,6 +92,10 @@ int main()
         //break.
         if(input == "exit")
             exit(0);
+        
+        //testing parse.
+        cout << "Testing parse" << endl;
+        display_vector(parseInput(input));
 
         //execute command.
         execute(input);
@@ -85,8 +109,10 @@ int main()
 
 void execute(string s)
 {
+    //c-string to hold command.
     char* args[2048];
     
+    //place and convert commands.
     args[0] = (char*)s.c_str();
     args[1] = NULL;
 
@@ -119,6 +145,33 @@ void execute(string s)
         }
     }
    
+    return;
+}
+
+vector<string> parseInput(string s)
+{
+    //make temp vector to hold parsed strings.
+    vector<string> temp;
+
+    //create boost magic function.
+    char_separator<char> sep(" ;||&(){}\"", ";||&()[]\"", keep_empty_tokens);
+
+    //create boost magic holder thingy.
+    tokenizer< char_separator<char> > cm(s,sep);
+
+    //for each loop to grab each peice and push it into a vector.
+    for(tokenizer< char_separator<char> >::iterator it = cm.begin(); it != cm.end(); ++it)
+        if(*it != "")
+            temp.push_back(*it);
+
+    //return that vector.
+    return temp;
+}
+
+void display_vector(vector<string> v)
+{
+    for(unsigned int i = 0; i < v.size(); ++i)
+        cout << i+1 << ": " << v.at(i) << endl;
     return;
 }
 
