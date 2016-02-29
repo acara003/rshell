@@ -24,7 +24,7 @@ using namespace std;
 using namespace boost;
 
 //execute command.
-void execute(string s);
+void execute(const vector<string> & s);
 
 //takes a string and returns vector of parsed string.
 vector<string> parseInput(string s);
@@ -98,7 +98,7 @@ int main()
         display_vector(parseInput(input));
 
         //execute command.
-        execute(input);
+        //execute(input);
 
     }
     
@@ -107,14 +107,16 @@ int main()
     return 0;
 }
 
-void execute(string s)
+void execute(const vector<string> &s)
 {
     //c-string to hold command.
     char* args[2048];
     
     //place and convert commands.
-    args[0] = (char*)s.c_str();
-    args[1] = NULL;
+   
+    for(unsigned int i = 0; i < s.size(); ++i)
+        args[i] = (char*)s.at(i).c_str();
+    args[s.size()] = NULL;
 
     pid_t pid = fork();
 
