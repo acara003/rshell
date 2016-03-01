@@ -242,8 +242,40 @@ void remove_comment(string &s)
             quotePos.push_back(i);
         else if(s.at(i) == '#')
             hashPos.push_back(i);
-    }    
+    }
 
+    //hold pos for hash.
+    int i = 0;
+        
+    //checks to see if in middle.
+    bool check = true;
+    
+    //pos of lone hash.
+    int pos = 0;
+
+    for(unsigned int j = 0; j < quotePos.size() - 1; j += 2)
+    {
+        if(hashPos.at(i) > quotePos.at(j) && hashPos.at(i) < quotePos.at(j+1))
+        {
+            check = true;
+            ++i;
+        }
+        else
+        {
+            check = false;
+            pos = hashPos.at(i);
+        }            
+    }
+
+    if(!check)
+    {
+        s = s.substr(0,pos);
+        return;            
+    } 
+
+    if(hashPos.at(hashPos.size()-1) > quotePos.at(quotePos.size()-1))
+        s = s.substr(0,hashPos.at(hashPos.size()-1));   
+    
     return;
 }
 
@@ -259,7 +291,3 @@ int find_char_amount(const string s, char c)
     return count;
 
 }
-
-
-
-
