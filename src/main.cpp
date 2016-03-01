@@ -31,7 +31,11 @@ void execute(const vector<string> & s);
 vector<string> parseInput(string s);
 
 //display vector.
-void display_vector(vector<string> v);
+template<typename unit>
+void display_vector(vector<unit> v);
+
+//helper function that finds amount of character.
+int find_char_amount(const string s,char c);
 
 //removes comment from input.
 void remove_comment(string &s);
@@ -116,7 +120,7 @@ int main()
         //execute(input);
 
     }
-    
+
     cout << "End of program" << endl;
    
     return 0;
@@ -185,7 +189,8 @@ vector<string> parseInput(string s)
     return temp;
 }
 
-void display_vector(vector<string> v)
+template<typename unit>
+void display_vector(vector<unit> v)
 {
     for(unsigned int i = 0; i < v.size(); ++i)
         cout << i+1 << ": " << v.at(i) << endl;
@@ -194,6 +199,10 @@ void display_vector(vector<string> v)
 
 void remove_comment(string &s)
 {
+    //just add a " to the end to avoid errors.
+    if(find_char_amount(s,'\"') %2 != 0)
+        s += '\"';
+
     //delete everything!
     if(s.find("#") == 0)
     {
@@ -214,13 +223,41 @@ void remove_comment(string &s)
         return;
     }
 
+    //if comment before quote then delete.
     if(s.find("\"") > s.find("#"))
     {
         s = s.substr(0,s.find("#"));
         return;
     }
 
+    //advanced situations.
+    //get a vector to hold positions of quotes and hash.
+    vector<int> quotePos;
+    vector<int> hashPos;
+
+    //grab pos.
+    for(unsigned int i = 0; i < s.size(); ++i)
+    {
+        if(s.at(i) == '\"')
+            quotePos.push_back(i);
+        else if(s.at(i) == '#')
+            hashPos.push_back(i);
+    }    
+
     return;
+}
+
+int find_char_amount(const string s, char c)
+{
+    if(s.find(c) == string::npos)
+        return 0;
+
+    int count = 0;
+    for(unsigned int i = 0; i < s.size(); ++i)
+        if(s.at(i) == c)
+            count++;
+    return count;
+
 }
 
 
