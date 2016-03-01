@@ -27,6 +27,9 @@ using namespace boost;
 //execute command.
 void execute(const vector<string> & s);
 
+//replaces char in string.
+void replace_char(string &s, char o, char r);
+
 //takes a string and returns vector of parsed string.
 vector<string> parseInput(string s);
 
@@ -96,14 +99,11 @@ int main()
         //geting input as a string.
         getline(cin,input);
 
-        //remove comments.
-        cout << "Before: " << input << endl;
-
         //remove extra white space.
         trim(input);
 
+        //remove comments.
         remove_comment(input);
-        cout << "After: " << input << endl;        
         
         //trim again just in case.
         trim(input);
@@ -113,8 +113,8 @@ int main()
             exit(0);
         
         //testing parse.
-        //cout << "Testing parse" << endl;
-        //display_vector(parseInput(input));
+        cout << "Testing parse" << endl;
+        display_vector(parseInput(input));
 
         //execute command.
         //execute(input);
@@ -171,11 +171,18 @@ void execute(const vector<string> &s)
 
 vector<string> parseInput(string s)
 {
+
+    //replace spaces.
+    replace_char(s,' ','_');
+
     //make temp vector to hold parsed strings.
     vector<string> temp;
 
     //create boost magic function.
-    char_separator<char> sep(" ;||&(){}\"", ";||&()[]\"", keep_empty_tokens);
+    //char_separator<char> sep(" ;||&(){}\"", ";||&()[]\"", keep_empty_tokens);
+
+    //test copy
+    char_separator<char> sep(" ;||&&(){}", ";||&&()[]",keep_empty_tokens);
 
     //create boost magic holder thingy.
     tokenizer< char_separator<char> > cm(s,sep);
@@ -187,6 +194,15 @@ vector<string> parseInput(string s)
 
     //return that vector.
     return temp;
+}
+
+void replace_char(string &s, char o, char r)
+{
+    if(s.find("\"") != string::npos)
+        for(unsigned int i = s.find("\""); i < s.find("\"",s.find("\"")+1);++i)
+            if(s.at(i) == o)
+                s.at(i) = r;    
+    return;
 }
 
 template<typename unit>
