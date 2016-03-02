@@ -173,15 +173,12 @@ vector<string> parseInput(string s)
 {
 
     //replace spaces.
-    replace_char(s,' ','_');
+    replace_char(s,' ','*');
 
     //make temp vector to hold parsed strings.
     vector<string> temp;
 
     //create boost magic function.
-    //char_separator<char> sep(" ;||&(){}\"", ";||&()[]\"", keep_empty_tokens);
-
-    //test copy
     char_separator<char> sep(" ;||&&(){}", ";||&&()[]",keep_empty_tokens);
 
     //create boost magic holder thingy.
@@ -190,7 +187,12 @@ vector<string> parseInput(string s)
     //for each loop to grab each peice and push it into a vector.
     for(tokenizer< char_separator<char> >::iterator it = cm.begin(); it != cm.end(); ++it)
         if(*it != "")
-            temp.push_back(*it);
+        {
+            //fix string.
+            string temp_string = *it;
+            replace_char(temp_string,'*',' ');
+            temp.push_back(temp_string);
+        }
 
     //return that vector.
     return temp;
@@ -200,6 +202,8 @@ void replace_char(string &s, char o, char r)
 {
     //no quotes.
     if(s.find("\"") == string::npos)
+        return;
+    else if(s.find(o) == string::npos)
         return;
 
     //vector to hold quote positions.
@@ -212,7 +216,7 @@ void replace_char(string &s, char o, char r)
     
     //count position.
     unsigned int count = 0;
-    
+   
     //replace.
     while(count < pos.size()) 
     {
@@ -224,11 +228,6 @@ void replace_char(string &s, char o, char r)
         count++;
     } 
 
-  
-//    if(s.find("\"") != string::npos)
-//        for(unsigned int i = s.find("\""); i < s.find("\"",s.find("\"")+1);++i)
-//            if(s.at(i) == o)
-//                s.at(i) = r;    
     return;
 }
 
@@ -243,7 +242,7 @@ void display_vector(vector<unit> v)
 void remove_comment(string &s)
 {
     //just add a " to the end to avoid errors.
-    if(find_char_amount(s,'\"') %2 != 0)
+    if(find_char_amount(s,'\"') % 2 != 0)
         s += '\"';
 
     //delete everything!
@@ -287,35 +286,42 @@ void remove_comment(string &s)
             hashPos.push_back(i);
     }
 
-    //hold pos for hash.
-    int i = 0;
-        
-    //checks to see if in middle.
-    bool check = true;
+    //no comments or hash for some reason.
+    if(hashPos.size() == 0 || quotePos.size() == 0)
+        return;
     
-    //pos of lone hash.
-    int pos = 0;
+    //just in case.
+    if(quotePos.size() % 2 != 0)
+        quotePos.push_back(0);
 
-    for(unsigned int j = 0; j < quotePos.size() - 1; j += 2)
-    {
-        if(hashPos.at(i) > quotePos.at(j) && hashPos.at(i) < quotePos.at(j+1))
+    //overall check;
+    vector<bool> check;
+        
+    //start it up.
+    for(unsigned int i = 0; i < hashPos.size(); ++i)
+        check.push_back(true);
+      
+ 
+    for(unsigned int i = 0; i < hashPos.size(); ++i )
+        for(unsigned int j = 0; j < quotePos.size(); j+=2 )
         {
-            check = true;
-            ++i;
+            if(hashPos.at(i) > quotePos.at(j) && hashPos.at(i) < quotePos.at(j+1))
+            {
+                check.at(i) = true;
+                break;
+            }
+            else
+                check.at(i) = false;
         }
-        else
+
+    for(unsigned int i = 0; i < check.size(); ++i)
+        if(!check.at(i))
         {
-            check = false;
-            pos = hashPos.at(i);
-        }            
-    }
+            s = s.substr(0,hashPos.at(i));
+            return;
+        }
 
-    if(!check)
-    {
-        s = s.substr(0,pos);
-        return;            
-    } 
-
+    //if comment at end then kill it.
     if(hashPos.at(hashPos.size()-1) > quotePos.at(quotePos.size()-1))
         s = s.substr(0,hashPos.at(hashPos.size()-1));   
     
