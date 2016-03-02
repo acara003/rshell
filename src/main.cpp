@@ -198,10 +198,37 @@ vector<string> parseInput(string s)
 
 void replace_char(string &s, char o, char r)
 {
-    if(s.find("\"") != string::npos)
-        for(unsigned int i = s.find("\""); i < s.find("\"",s.find("\"")+1);++i)
+    //no quotes.
+    if(s.find("\"") == string::npos)
+        return;
+
+    //vector to hold quote positions.
+    vector<int> pos;
+
+    //place positions of char into vector.
+    for(unsigned int i = 0; i < s.size(); ++i)
+        if(s.at(i) == '\"')
+            pos.push_back(i);   
+    
+    //count position.
+    unsigned int count = 0;
+    
+    //replace.
+    while(count < pos.size()) 
+    {
+        for(int i = pos.at(count); i < pos.at(count+1); ++i)
             if(s.at(i) == o)
-                s.at(i) = r;    
+                s.at(i) = r;
+    
+        count++;
+        count++;
+    } 
+
+  
+//    if(s.find("\"") != string::npos)
+//        for(unsigned int i = s.find("\""); i < s.find("\"",s.find("\"")+1);++i)
+//            if(s.at(i) == o)
+//                s.at(i) = r;    
     return;
 }
 
