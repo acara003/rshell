@@ -43,6 +43,9 @@ int find_char_amount(const string s,char c);
 //removes comment from input.
 void remove_comment(string &s);
 
+//removes char in string.
+void remove_char(string &s, char c);
+
 int main()
 {
 
@@ -109,15 +112,15 @@ int main()
         trim(input);
 
         //break.
-        if(input == "exit")
-            exit(0);
+        //if(input == "exit")
+            //exit(0);
         
         //testing parse.
         cout << "Testing parse" << endl;
         display_vector(parseInput(input));
 
         //execute command.
-        //execute(input);
+        execute(parseInput(input));
 
     }
 
@@ -128,13 +131,27 @@ int main()
 
 void execute(const vector<string> &s)
 {
+    //check to see if user wants to quit and its the only command.
+    if(s.size() == 1)
+        for(unsigned int i = 0; i < s.size(); ++i)
+            if(s.at(i) == "exit")
+                exit(0);
+    
     //c-string to hold command.
     char* args[2048];
     
-    //place and convert commands.
-   
+    //place and convert commands. 
+//    for(unsigned int i = 0; i < s.size(); ++i)
+//        args[i] = (char*)s.at(i).c_str();
+//    args[s.size()] = NULL;
+
+    //place, remove comments and convert commands.
     for(unsigned int i = 0; i < s.size(); ++i)
-        args[i] = (char*)s.at(i).c_str();
+    {
+        string temp = s.at(i);
+        replace_char(temp,'\"',' ');
+        args[i] = (char*)temp.c_str();
+    }
     args[s.size()] = NULL;
 
     pid_t pid = fork();
@@ -200,6 +217,22 @@ vector<string> parseInput(string s)
 
 void replace_char(string &s, char o, char r)
 {
+    //different use for the function.
+    if(o == '\"')
+    {
+        //nothing to replace.
+        if(s.find(o) == string::npos)
+            return;
+        
+        //replace.
+        for(unsigned int i = 0; i < s.size(); ++i)
+            if(s.at(i) == o)
+                s.at(i) = r;
+
+        return;
+
+    }
+
     //no quotes.
     if(s.find("\"") == string::npos)
         return;
@@ -301,7 +334,7 @@ void remove_comment(string &s)
     for(unsigned int i = 0; i < hashPos.size(); ++i)
         check.push_back(true);
       
- 
+    //check if hash is in quotes.
     for(unsigned int i = 0; i < hashPos.size(); ++i )
         for(unsigned int j = 0; j < quotePos.size(); j+=2 )
         {
@@ -314,6 +347,7 @@ void remove_comment(string &s)
                 check.at(i) = false;
         }
 
+    //check bool vector to delete string.
     for(unsigned int i = 0; i < check.size(); ++i)
         if(!check.at(i))
         {
@@ -340,3 +374,44 @@ int find_char_amount(const string s, char c)
     return count;
 
 }
+
+//broken.
+void remove_char(string &s, char c)
+{
+    //if not there then just return.
+    if(s.find(c) == string::npos)
+        return;
+    else if(s.size() == 1 && s.at(0) == c)
+    {
+        s = "";
+        return;
+    }  
+    
+    //vector to hold positions of char.
+    vector<int> pos;
+
+    //grab pos of char.
+    for(unsigned int i = 0; i < s.size(); ++i)
+        if(s.at(i) == c)
+            pos.push_back(i);
+
+    //start removing.
+    for(unsigned int i = 0; i < pos.size(); ++i)
+    {
+        if(pos.at(i) == 0)
+            s = s.substr(i+1);
+        else if(static_cast<unsigned>(pos.at(i)) == s.size() - 1)
+            s = s.substr(0,s.size() - 1);
+        else
+            s = s.substr(0,pos.at(i)) + s.substr(pos.at(i)+1);
+     
+        //because you delete a index, you remove a index from the positions.    
+        if(pos.size() != 0)
+            for(unsigned int j = i; j < pos.size(); ++j)
+                if(pos.at(i) >= 1)    
+                    pos.at(i) -= 1;
+    }
+
+    return;
+}
+
