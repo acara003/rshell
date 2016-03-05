@@ -149,7 +149,7 @@ void execute(const vector<string> &s)
     for(unsigned int i = 0; i < s.size(); ++i)
     {
         string temp = s.at(i);
-        replace_char(temp,'\"',' ');
+        remove_char(temp,'\"');
         args[i] = (char*)temp.c_str();
     }
     args[s.size()] = NULL;
@@ -375,42 +375,18 @@ int find_char_amount(const string s, char c)
 
 }
 
-//broken.
 void remove_char(string &s, char c)
 {
     //if not there then just return.
     if(s.find(c) == string::npos)
         return;
-    else if(s.size() == 1 && s.at(0) == c)
-    {
-        s = "";
-        return;
-    }  
     
-    //vector to hold positions of char.
-    vector<int> pos;
+    string temp = "";
 
-    //grab pos of char.
     for(unsigned int i = 0; i < s.size(); ++i)
-        if(s.at(i) == c)
-            pos.push_back(i);
-
-    //start removing.
-    for(unsigned int i = 0; i < pos.size(); ++i)
-    {
-        if(pos.at(i) == 0)
-            s = s.substr(i+1);
-        else if(static_cast<unsigned>(pos.at(i)) == s.size() - 1)
-            s = s.substr(0,s.size() - 1);
-        else
-            s = s.substr(0,pos.at(i)) + s.substr(pos.at(i)+1);
-     
-        //because you delete a index, you remove a index from the positions.    
-        if(pos.size() != 0)
-            for(unsigned int j = i; j < pos.size(); ++j)
-                if(pos.at(i) >= 1)    
-                    pos.at(i) -= 1;
-    }
+        if(s.at(i) != c)
+            temp += s.at(i);
+    s = temp;
 
     return;
 }
