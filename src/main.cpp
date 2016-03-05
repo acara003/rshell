@@ -20,6 +20,9 @@
 #include "boost/tokenizer.hpp"
 #include "boost/foreach.hpp"
 
+//the man!
+#include "sys/mman.h"
+
 //that one class.
 #include "Command.h"
 
@@ -27,7 +30,7 @@ using namespace std;
 using namespace boost;
 
 //execute command.
-void execute(const vector<string> & s);
+void execute(const vector<string> &s, bool &result);
 
 //replaces char in string.
 void replace_char(string &s, char o, char r);
@@ -54,8 +57,21 @@ bool isFlag(string f);
 //pass in vector of string and vector of Commands and populates the second vector.
 void create_commands(const vector<string> &s, vector<Command> &c);
 
+//perform execution.
+void execute_commands(const vector<Command> &v, bool &result);
+
+//result of execution.
+static bool *execRes;
+
 int main()
 {
+    //lets the bool come back from the shadow realm.
+    execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
+    PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
+
+    //set it to true because nothing has failed.
+    *execRes = true;
+
     //grab the login.
     char* login = getlogin();
 
@@ -140,9 +156,13 @@ int main()
             comVector.at(i).display();
             cout << endl;
         }
+        
+        //set to true.
+        *execRes = true;
+        cout << "initialize to true: " << *execRes << endl;
 
-        //execute command.
-        execute(parseIn);
+        //execute that stuff you know?
+        execute_commands(comVector,*execRes);
 
         //clear vectors.
         parseIn.clear();
@@ -158,7 +178,7 @@ int main()
     return 0;
 }
 
-void execute(const vector<string> &s)
+void execute(const vector<string> &s, bool &result)
 {
     //check to see if user wants to quit and its the only command.
     if(s.size() == 1)
@@ -198,6 +218,9 @@ void execute(const vector<string> &s)
             //execute didn't work.
             perror("execvp");
             
+            //failed so set to false;
+            result = false;
+
             //break out of shadow realm.
             exit(1);
         }
@@ -595,6 +618,24 @@ void create_commands(const vector<string> &s, vector<Command> &c)
     //push into command vector if the command has something in it.
     if(xcom.empty() == false)
         c.push_back(xcom);    
+
+    return;
+}
+
+void execute_commands(const vector<Command> &v, bool &result)
+{
+    //nothing to execute.
+    if(v.size() == 0)
+        return;
+
+    //testing.
+    cout << "result before: " << result <<  endl;    
+
+    //execute commands.
+    execute(v.at(0).get_vector(),result);
+
+    //testing.
+    cout << "result after: " << result << endl;
 
     return;
 }
