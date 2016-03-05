@@ -394,6 +394,18 @@ void remove_char(string &s, char c)
     return;
 }
 
+int is_connector(string s)
+{
+    if(s == ";")
+		return 1;
+	if(s == "&&")
+		return 2;
+	if(s == "||")
+		return 3;
+									        
+	return -1;
+}
+
 bool isFlag(string f)
 {	//default list of possible flags
 	string flags = "-e -d -f";
