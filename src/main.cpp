@@ -51,8 +51,8 @@ string remove_char(const string &s, char c);
 //checks if string passed in contains a flag
 bool isFlag(string f);
 
-//creates command types from vector of strings.
-Command create_commands(const vector<string> &v);
+//pass in vector of string and vector of Commands and populates the second vector.
+void create_commands(const vector<string> &s, vector<Command> &c);
 
 int main()
 {
@@ -131,45 +131,10 @@ int main()
         parseInput(input,parseIn);
         //display_vector(parseIn);
 
-        //temp variable.
-        Command xcom;
+        //create them commands.
+        create_commands(parseIn,comVector);
 
-        //make commands and push that into command vector.
-        for(unsigned int i = 0; i < parseIn.size(); ++i)
-        {
-            //string to compare.
-            string m = parseIn.at(i);
-            if(m == ";" || m == "&" || m == "|")
-            {
-                if(m == ";")
-                {
-                    //ends with a semi colon.
-                    xcom.set_op(1);
-                }
-                else if(m == "&")
-                {
-                    if(i+1 < parseIn.size() && parseIn.at(i+1) == "&")
-                        xcom.set_op(2);
-                    ++i;
-                }
-                else if(m == "|")
-                {
-                    if(i+1 < parseIn.size() && parseIn.at(i+1) == "|")
-                        xcom.set_op(3);
-                    ++i;
-                }
-
-                //add it.
-                comVector.push_back(xcom);
-                xcom.clear();
-            }
-            else
-                xcom.push_back(parseIn.at(i));
-        }
-        //push into command vector if the command has something in it.
-        if(xcom.empty() == false)
-            comVector.push_back(xcom);    
-
+        //display.
         for(unsigned int i = 0; i < comVector.size(); ++i)
         {
             comVector.at(i).display();
@@ -204,40 +169,19 @@ void execute(const vector<string> &s)
     //c-string to hold command.
     char* args[128];
 
-    int count = 0;
-
     //cout << endl;
     //place, remove comments and convert commands.
     for(unsigned int i = 0; i < s.size(); ++i)
     {
-       // string temp = remove_char(s.at(i),'\"');
+        //string temp = remove_char(s.at(i),'\"');
 
-        //cout << "(char*)temp.c_str(): " << (char*)temp.c_str() << endl;
-        //cout << "s.at(i): " << s.at(i) << endl;    
-
+        //does not remove comments but works.
         args[i] = (char*)s.at(i).c_str();
+        
+        //removes comments but does not work.
         //args[i] = (char*)temp.c_str();
-        count++;
-
-        //cout << "temp after: " << temp << endl;
-        //cout << "args at " << i << ": " << args[i] << endl << endl;
     }
-
-    /*
-    cout << "array before: " << endl;
-    for(int i = 0; i < count; ++i)
-        cout << args[i] << endl;
-    cout << endl;
-    */    
-
     args[s.size()] = '\0';
-
-    /*
-    cout << "array after: " << endl;
-    for(int i = 0; i < count; ++i)
-        cout << args[i] << endl;
-    cout << endl;
-    */
 
     //creates fork process.
     pid_t pid = fork();
@@ -257,7 +201,6 @@ void execute(const vector<string> &s)
             //break out of shadow realm.
             exit(1);
         }
-
     }
     if(pid > 0)
     {
@@ -269,7 +212,6 @@ void execute(const vector<string> &s)
         }
     }
    
-
     return;
 }
 
@@ -477,6 +419,7 @@ string remove_char(const string &s, char c)
     return t;
 }
 
+//uselss.
 int is_connector(string s)
 {
     if(s == ";")
@@ -611,11 +554,49 @@ bool test(vector<string> &commands, vector<char*> &command_v)
 	return true
 }*/
 
-Command create_commands(const vector<string> &v)
+void create_commands(const vector<string> &s, vector<Command> &c)
 {
-    Command temp = Command(v);    
+    //temp variable.
+    Command xcom;
     
+    //make commands and push that into command vector.
+    for(unsigned int i = 0; i < s.size(); ++i)
+    {
+        //string to compare.
+        string m = s.at(i);
+        if(m == ";" || m == "&" || m == "|")
+        {
+            if(m == ";")
+            {
+                //ends with a semi colon.
+                xcom.set_op(1);
+            }
+            else if(m == "&")
+            {
+                if(i+1 < s.size() && s.at(i+1) == "&")
+                    xcom.set_op(2);
+                ++i;
+            }
+            else if(m == "|")
+            {
+                if(i+1 < s.size() && s.at(i+1) == "|")
+                    xcom.set_op(3);
+                ++i;
+            }
+
+            //add it.
+            c.push_back(xcom);
+            xcom.clear();
+        }
+        else
+            xcom.push_back(s.at(i));
+    }   
     
-    return temp;
+    //push into command vector if the command has something in it.
+    if(xcom.empty() == false)
+        c.push_back(xcom);    
+
+    return;
 }
+
 
