@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <queue>
+#include <sys/stat.h>
 
 //getlogin() and gethostname().
 #include <unistd.h>
@@ -412,6 +414,18 @@ string remove_char(const string &s, char c)
     return t;
 }
 
+int is_connector(string s)
+{
+    if(s == ";")
+		return 1;
+	if(s == "&&")
+		return 2;
+	if(s == "||")
+		return 3;
+									        
+	return -1;
+}
+
 bool isFlag(string f)
 {
 	//default list of possible flags
@@ -422,6 +436,117 @@ bool isFlag(string f)
 		return true;
 	return false;
 }
+
+/*
+bool test(vector<string> &commands, vector<char*> &command_v)
+{	
+	//defaults to "-e"
+	string flag = "-e";
+
+	struct stat s_thing;
+
+	//put everything into a queue for ease of use
+	queue<string> coms;
+	for (unsigned int i = 0; i < commands.size(); i++)
+	{
+		coms.push_back(commands.at(i));
+	}
+
+	//was a bracket used for the test command?
+	bool bracketUsed = false;
+
+	//set if a bracket was used
+	if(coms.front() == "[";
+		bracketUsed = true;
+	
+	//remove the first part of the command regardless of whether it's "test" or "["
+	coms.pop();
+	
+	if (isTestFlag(coms.front()))
+	{
+		flag = coms.front();
+		//now we have the flag for the test
+		coms.pop()
+	}
+	
+	//if there's another flag attempt then it's broken
+	if (coms.front().at(0) == "-")
+	{
+		cout << "ERROR: incorrect flags" << endl;
+		
+		//keep deleting from queue till the next command
+		while (!is_connector(coms.front()))
+		{
+			coms.pop();
+		}
+		return true;
+	}
+
+	// if the first part of the path is a "/" remove it (that way it can't mess up)
+	if(coms.front().at(0) == "/")
+		commands.front().substr(1, commands.front().size() - 1);
+	
+	//make a new c_string to hold the file path
+	char *filePath = new char[coms.front.size()];
+	
+	//copy it on over from the command vector
+	strcpy(filePath, coms.front().c_str());
+	command_v.push_back(filePath);
+
+	//moving along
+	coms.pop();
+	
+	//Did we use a bracket instead of "test"? If so get rid of the last bracket
+	if(bracketUsed)
+	{
+		coms.pop();
+	}
+	
+	//valuse for using the stat thingy
+	int current_stat;
+	
+	//get the status of the command
+	current_stat = stat(command_v.front(), &s_thing);
+	
+	//Did it fail?
+	if(current_stat < 0)
+	{	
+		//Yup it did
+		perror("ERROR: Coudn't get the stat");
+		return true;
+	}
+	//No it didn't so lets try out with "-e"
+	if (flag == "-e")
+	{
+		return false;
+	}
+	
+	//Try it out with "-f"
+	if(flag == "-f")
+	{
+		if(S_ISREG(s_thing.st_mode))
+		{
+			return false
+		} else
+		{
+			return true
+		}
+	}
+
+	//Try it out with "-d"
+	if (flag == "-d")
+	{
+		if (S_ISDIR(s_thing.st_mode))
+		{
+			return false;
+		} else
+		{
+			return true
+		}
+	}
+	//Obviously something went wrong if you got here
+	return true
+}*/
 
 vector<Command> create_commands(const vector<string> &v)
 {
