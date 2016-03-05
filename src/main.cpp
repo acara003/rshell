@@ -46,9 +46,11 @@ void remove_comment(string &s);
 //removes char in string.
 void remove_char(string &s, char c);
 
+//checks if string passed in contains a flag
+bool isFlag(string f);
+
 int main()
 {
-
     //grab the login.
     char* login = getlogin();
 
@@ -391,3 +393,11 @@ void remove_char(string &s, char c)
     return;
 }
 
+bool isFlag(string f)
+{	//default list of possible flags
+	string flags = "-e -d -f";
+	//see if string is one of the flags
+	if (flags.find(f) != string::npos)
+		return true;
+	return false;
+}
