@@ -46,6 +46,9 @@ void remove_comment(string &s);
 //removes char in string.
 void remove_char(string &s, char c);
 
+//creates command types from vector of strings.
+vector<Command> create_commands(const vector<string> &v);
+
 int main()
 {
 
@@ -111,10 +114,6 @@ int main()
         //trim again just in case.
         trim(input);
 
-        //break.
-        //if(input == "exit")
-            //exit(0);
-        
         //testing parse.
         cout << "Testing parse" << endl;
         display_vector(parseInput(input));
@@ -140,11 +139,6 @@ void execute(const vector<string> &s)
     //c-string to hold command.
     char* args[2048];
     
-    //place and convert commands. 
-//    for(unsigned int i = 0; i < s.size(); ++i)
-//        args[i] = (char*)s.at(i).c_str();
-//    args[s.size()] = NULL;
-
     //place, remove comments and convert commands.
     for(unsigned int i = 0; i < s.size(); ++i)
     {
@@ -154,6 +148,7 @@ void execute(const vector<string> &s)
     }
     args[s.size()] = NULL;
 
+    //creates fork process.
     pid_t pid = fork();
 
     if(pid == -1)
@@ -381,13 +376,29 @@ void remove_char(string &s, char c)
     if(s.find(c) == string::npos)
         return;
     
+    //start empty.
     string temp = "";
 
+    //add everything thats not what we dont want.
     for(unsigned int i = 0; i < s.size(); ++i)
         if(s.at(i) != c)
             temp += s.at(i);
+
+    //transfer to s.
     s = temp;
 
     return;
 }
+
+vector<Command> create_commands(const vector<string> &v)
+{
+    vector<Command> commandVector;
+    Command temp;    
+    
+    
+
+    return commandVector;
+}
+
+
 
