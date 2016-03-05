@@ -416,7 +416,7 @@ bool isFlag(string f)
 }
 
 /*
-bool test(vector<string> &commands, vector<char*> &command_v)
+bool test(vector<string> &commands, vector<strings> &command_list)
 {	
 	//defaults to "-e"
 	string flag = "-e";
@@ -462,14 +462,14 @@ bool test(vector<string> &commands, vector<char*> &command_v)
 
 	// if the first part of the path is a "/" remove it (that way it can't mess up)
 	if(coms.front().at(0) == "/")
-		commands.front().substr(1, commands.front().size() - 1);
+		coms.front().substr(1, coms.front().size() - 1);
 	
 	//make a new c_string to hold the file path
 	char *filePath = new char[coms.front.size()];
 	
 	//copy it on over from the command vector
 	strcpy(filePath, coms.front().c_str());
-	command_v.push_back(filePath);
+	command_list.push_back(filePath);
 
 	//moving along
 	coms.pop();
@@ -484,7 +484,7 @@ bool test(vector<string> &commands, vector<char*> &command_v)
 	int current_stat;
 	
 	//get the status of the command
-	current_stat = stat(command_v.front(), &s_thing);
+	current_stat = stat(command_list.front(), &s_thing);
 	
 	//Did it fail?
 	if(current_stat < 0)
