@@ -291,7 +291,7 @@ void remove_comment(string &s)
         return;
     }
 
-    //if no comments then delets everything from hash forward.
+    //if no comments then deletes everything from hash forward.
     if(s.find("\"") == string::npos && s.find("#") != string::npos)
     {
         s = s.substr(0,s.find("#"));
