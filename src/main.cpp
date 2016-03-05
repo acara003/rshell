@@ -33,7 +33,7 @@ void execute(const vector<string> & s);
 void replace_char(string &s, char o, char r);
 
 //takes a string and returns vector of parsed string.
-vector<string> parseInput(string s);
+void parseInput(string s, vector<string> &v);
 
 //display vector.
 template<typename unit>
@@ -52,7 +52,7 @@ string remove_char(const string &s, char c);
 bool isFlag(string f);
 
 //creates command types from vector of strings.
-vector<Command> create_commands(const vector<string> &v);
+Command create_commands(const vector<string> &v);
 
 int main()
 {
@@ -94,6 +94,12 @@ int main()
     //string to hold user input.
     string input;
 
+    //vector to hold parssed string.
+    vector<string> parseIn;
+
+    //hold all the Commands.
+    vector<Command> comVector;
+
     while(true)
     {
         //output login@hostname.
@@ -119,12 +125,67 @@ int main()
         trim(input);
 
         //testing parse.
-        cout << "Testing parse" << endl;
-        display_vector(parseInput(input));
+        //cout << "Testing parse" << endl;
+
+        //parse
+        parseInput(input,parseIn);
+        //display_vector(parseIn);
+
+        //temp variable.
+        Command xcom;
+
+        //make commands and push that into command vector.
+        for(unsigned int i = 0; i < parseIn.size(); ++i)
+        {
+            //string to compare.
+            string m = parseIn.at(i);
+            if(m == ";" || m == "&" || m == "|")
+            {
+                if(m == ";")
+                {
+                    //ends with a semi colon.
+                    xcom.set_op(1);
+                }
+                else if(m == "&")
+                {
+                    if(i+1 < parseIn.size() && parseIn.at(i+1) == "&")
+                        xcom.set_op(2);
+                    ++i;
+                }
+                else if(m == "|")
+                {
+                    if(i+1 < parseIn.size() && parseIn.at(i+1) == "|")
+                        xcom.set_op(3);
+                    ++i;
+                }
+
+                //add it.
+                comVector.push_back(xcom);
+                xcom.clear();
+            }
+            else
+                xcom.push_back(parseIn.at(i));
+        }
+        //push into command vector if the command has something in it.
+        if(xcom.empty() == false)
+            comVector.push_back(xcom);    
+
+        for(unsigned int i = 0; i < comVector.size(); ++i)
+        {
+            comVector.at(i).display();
+            cout << endl;
+        }
 
         //execute command.
-        execute(parseInput(input));
+        execute(parseIn);
 
+        //clear vectors.
+        parseIn.clear();
+        comVector.clear();
+
+        //just in case.
+        cin.clear();
+        input.clear();
     }
 
     cout << "End of program" << endl;
@@ -145,33 +206,38 @@ void execute(const vector<string> &s)
 
     int count = 0;
 
-    cout << endl;
+    //cout << endl;
     //place, remove comments and convert commands.
     for(unsigned int i = 0; i < s.size(); ++i)
     {
        // string temp = remove_char(s.at(i),'\"');
 
         //cout << "(char*)temp.c_str(): " << (char*)temp.c_str() << endl;
-        cout << "s.at(i): " << s.at(i) << endl;    
+        //cout << "s.at(i): " << s.at(i) << endl;    
 
         args[i] = (char*)s.at(i).c_str();
         //args[i] = (char*)temp.c_str();
         count++;
 
         //cout << "temp after: " << temp << endl;
-        cout << "args at " << i << ": " << args[i] << endl << endl;
+        //cout << "args at " << i << ": " << args[i] << endl << endl;
     }
+
+    /*
     cout << "array before: " << endl;
     for(int i = 0; i < count; ++i)
         cout << args[i] << endl;
     cout << endl;
+    */    
 
     args[s.size()] = '\0';
 
+    /*
     cout << "array after: " << endl;
     for(int i = 0; i < count; ++i)
         cout << args[i] << endl;
     cout << endl;
+    */
 
     //creates fork process.
     pid_t pid = fork();
@@ -207,14 +273,11 @@ void execute(const vector<string> &s)
     return;
 }
 
-vector<string> parseInput(string s)
+void parseInput(string s, vector<string> &v)
 {
 
     //replace spaces.
     replace_char(s,' ','*');
-
-    //make temp vector to hold parsed strings.
-    vector<string> temp;
 
     //create boost magic function.
     char_separator<char> sep(" ;||&&(){}", ";||&&()[]",keep_empty_tokens);
@@ -229,11 +292,11 @@ vector<string> parseInput(string s)
             //fix string.
             string temp_string = *it;
             replace_char(temp_string,'*',' ');
-            temp.push_back(temp_string);
+            v.push_back(temp_string);
         }
 
-    //return that vector.
-    return temp;
+    //return.
+    return; 
 }
 
 void replace_char(string &s, char o, char r)
@@ -548,13 +611,11 @@ bool test(vector<string> &commands, vector<char*> &command_v)
 	return true
 }*/
 
-vector<Command> create_commands(const vector<string> &v)
+Command create_commands(const vector<string> &v)
 {
-    vector<Command> commandVector;
-    Command temp;    
+    Command temp = Command(v);    
     
     
-
-    return commandVector;
+    return temp;
 }
 
