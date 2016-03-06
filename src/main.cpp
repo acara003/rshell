@@ -151,15 +151,17 @@ int main()
         create_commands(parseIn,comVector);
 
         //display.
+        /*
         for(unsigned int i = 0; i < comVector.size(); ++i)
         {
             comVector.at(i).display();
             cout << endl;
         }
+        */
         
         //set to true.
         *execRes = true;
-        cout << "initialize to true: " << *execRes << endl;
+        //cout << "initialize to true: " << *execRes << endl;
 
         //execute that stuff you know?
         execute_commands(comVector,*execRes);
@@ -644,9 +646,6 @@ void execute_commands(const vector<Command> &v, bool &result)
             else if(v.at(i-1).get_op() == 3 && result == false)
                 execute(v.at(i).get_vector(),result);
         }
-
-        //testing.
-        cout << i << ": result: " << result << endl;
     }
 
     return;
