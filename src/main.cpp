@@ -143,11 +143,11 @@ int main()
         trim(input);
 
         //testing parse.
-        //cout << "Testing parse" << endl;
+        cout << "Testing parse" << endl;
 
         //parse
         parseInput(input,parseIn);
-        //display_vector(parseIn);
+        display_vector(parseIn);
 
         //create them commands.
         create_commands(parseIn,comVector,0);
@@ -156,8 +156,11 @@ int main()
         *execRes = true;
         //cout << "initialize to true: " << *execRes << endl;
 
+        for(unsigned int i = 0; i < comVector.size(); ++i)
+            comVector.at(i)->display();
+
         //execute that stuff you know?
-        execute_commands(comVector,*execRes);
+//        execute_commands(comVector,*execRes);
 
         //clear vectors.
         parseIn.clear();
@@ -606,28 +609,64 @@ void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
             c.push_back(new Normal(xcom));
             xcom.clear();
         }
-/*        else if(m == "(")
+        else if(m == "(")
         {
+            //new string vector(forwards).
             vector<string> smalls;
+            
+            //new command vector.
             vector<Command*> bigs;
 
-            //copy.
-            for(unsigned int j = i; j < s.size(); ++j)
-            {    
-                smalls.push_back(s.at(j));
-                if(s.at(i) == "m")
+            //new string vector(backwards).
+            vector<string> copyTemp;
+
+            //flag to know when to start copying.
+            bool copyFlag = false;
+            
+            //new index of vector starting point.
+            int hold;
+            
+            //copy string into vector.
+            for(unsigned int j = s.size() -1; j > i; --j)
+            {
+                //start pushing!      
+                if(copyFlag)   
+                    copyTemp.push_back(s.at(j));
+
+                //godd to go.
+                if(s.at(j) == ")")
                 {
-                    i = j;
-                    break;
+                    copyFlag = true;
+                    hold = j;
                 }
             }
-
+            
+            //since backward make forwards.
+            for(unsigned int k = 0; k < copyTemp.size(); ++k)
+                smalls.push_back(copyTemp.at(copyTemp.size() - 1 - k));
+    
+            //testing.
+            //cout << "new vector" << endl;
+            //display_vector(smalls);
+            
+            //recursively make new commands.
             create_commands(smalls,bigs,flagNum + 1);
-            c.push_back(new Pcommand(bigs));
+
+            //add to vector.
+            c.push_back(new Multi(bigs));
+
+            //test new commands.
+            //cout << "new command vector" << endl;
+            //for(unsigned int j = 0; j < bigs.size(); ++j)
+            //    bigs.at(j)->display();           
+
+            //new index to start from.
+            i = hold;
         }
-        else if(m == ")" && flagNum != 0)
+        else if(m == ")")
         {
-            return;
+            if(flagNum != 0)
+                return;
         }
         else if(m == "[")
         {
@@ -636,9 +675,12 @@ void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
         else if(m == "]")
         {
     
-        }*/
+        }
         else
-            xcom.push_back(s.at(i));
+        {
+            if(m != "[" || m != "]" || m != "(" || m != ")")
+                xcom.push_back(s.at(i));
+        }
     }   
     
     //push into command vector if the command has something in it.
@@ -660,10 +702,10 @@ void execute_commands(const vector<Command*> &v, bool &result)
     //start the process.
     for(unsigned int i = 0; i < v.size(); ++i)
     {
-        //if(v.at(i)->type() == 2)
-        //{
-        //    execute_commands(v.at(i)->grab_vector(),result);
-        //}
+        if(v.at(i)->type() == 2)
+        {
+            execute_commands(v.at(i)->grab_vector(),result);
+        }
         if(i == 0)
         {
             execute(v.at(i)->get_vector(),result);
