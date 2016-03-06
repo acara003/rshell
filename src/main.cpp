@@ -20,6 +20,9 @@
 #include "boost/tokenizer.hpp"
 #include "boost/foreach.hpp"
 
+//the man!
+#include "sys/mman.h"
+
 //that one class.
 #include "Command.h"
 
@@ -27,13 +30,13 @@ using namespace std;
 using namespace boost;
 
 //execute command.
-void execute(const vector<string> & s);
+void execute(const vector<string> &s, bool &result);
 
 //replaces char in string.
 void replace_char(string &s, char o, char r);
 
 //takes a string and returns vector of parsed string.
-vector<string> parseInput(string s);
+void parseInput(string s, vector<string> &v);
 
 //display vector.
 template<typename unit>
@@ -51,11 +54,24 @@ string remove_char(const string &s, char c);
 //checks if string passed in contains a flag
 bool isFlag(string f);
 
-//creates command types from vector of strings.
-vector<Command> create_commands(const vector<string> &v);
+//pass in vector of string and vector of Commands and populates the second vector.
+void create_commands(const vector<string> &s, vector<Command> &c);
+
+//perform execution.
+void execute_commands(const vector<Command> &v, bool &result);
+
+//result of execution.
+static bool *execRes;
 
 int main()
 {
+    //lets the bool come back from the shadow realm.
+    execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
+    PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
+
+    //set it to true because nothing has failed.
+    *execRes = true;
+
     //grab the login.
     char* login = getlogin();
 
@@ -94,6 +110,12 @@ int main()
     //string to hold user input.
     string input;
 
+    //vector to hold parssed string.
+    vector<string> parseIn;
+
+    //hold all the Commands.
+    vector<Command> comVector;
+
     while(true)
     {
         //output login@hostname.
@@ -119,12 +141,38 @@ int main()
         trim(input);
 
         //testing parse.
-        cout << "Testing parse" << endl;
-        display_vector(parseInput(input));
+        //cout << "Testing parse" << endl;
 
-        //execute command.
-        execute(parseInput(input));
+        //parse
+        parseInput(input,parseIn);
+        //display_vector(parseIn);
 
+        //create them commands.
+        create_commands(parseIn,comVector);
+
+        //display.
+        /*
+        for(unsigned int i = 0; i < comVector.size(); ++i)
+        {
+            comVector.at(i).display();
+            cout << endl;
+        }
+        */
+        
+        //set to true.
+        *execRes = true;
+        //cout << "initialize to true: " << *execRes << endl;
+
+        //execute that stuff you know?
+        execute_commands(comVector,*execRes);
+
+        //clear vectors.
+        parseIn.clear();
+        comVector.clear();
+
+        //just in case.
+        cin.clear();
+        input.clear();
     }
 
     cout << "End of program" << endl;
@@ -132,7 +180,7 @@ int main()
     return 0;
 }
 
-void execute(const vector<string> &s)
+void execute(const vector<string> &s, bool &result)
 {
     //check to see if user wants to quit and its the only command.
     if(s.size() == 1)
@@ -172,6 +220,19 @@ void execute(const vector<string> &s)
     for(int i = 0; i < count; ++i)
         cout << args[i] << endl;
     cout << endl;
+    //cout << endl;
+    //place, remove comments and convert commands.
+    for(unsigned int i = 0; i < s.size(); ++i)
+    {
+        //string temp = remove_char(s.at(i),'\"');
+
+        //does not remove comments but works.
+        args[i] = (char*)s.at(i).c_str();
+        
+        //removes comments but does not work.
+        //args[i] = (char*)temp.c_str();
+    }
+    args[s.size()] = '\0';
 
     //creates fork process.
     pid_t pid = fork();
@@ -188,10 +249,12 @@ void execute(const vector<string> &s)
             //execute didn't work.
             perror("execvp");
             
+            //failed so set to false;
+            result = false;
+
             //break out of shadow realm.
             exit(1);
         }
-
     }
     if(pid > 0)
     {
@@ -207,14 +270,11 @@ void execute(const vector<string> &s)
     return;
 }
 
-vector<string> parseInput(string s)
+void parseInput(string s, vector<string> &v)
 {
 
     //replace spaces.
     replace_char(s,' ','*');
-
-    //make temp vector to hold parsed strings.
-    vector<string> temp;
 
     //create boost magic function.
     char_separator<char> sep(" ;||&&(){}", ";||&&()[]",keep_empty_tokens);
@@ -229,11 +289,11 @@ vector<string> parseInput(string s)
             //fix string.
             string temp_string = *it;
             replace_char(temp_string,'*',' ');
-            temp.push_back(temp_string);
+            v.push_back(temp_string);
         }
 
-    //return that vector.
-    return temp;
+    //return.
+    return; 
 }
 
 void replace_char(string &s, char o, char r)
@@ -414,6 +474,7 @@ string remove_char(const string &s, char c)
     return t;
 }
 
+//uselss.
 int is_connector(string s)
 {
     if(s == ";")
@@ -548,13 +609,76 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 	return true
 }*/
 
-vector<Command> create_commands(const vector<string> &v)
+void create_commands(const vector<string> &s, vector<Command> &c)
 {
-    vector<Command> commandVector;
-    Command temp;    
+    //temp variable.
+    Command xcom;
     
-    
+    //make commands and push that into command vector.
+    for(unsigned int i = 0; i < s.size(); ++i)
+    {
+        //string to compare.
+        string m = s.at(i);
+        if(m == ";" || m == "&" || m == "|")
+        {
+            if(m == ";")
+            {
+                //ends with a semi colon.
+                xcom.set_op(1);
+            }
+            else if(m == "&")
+            {
+                if(i+1 < s.size() && s.at(i+1) == "&")
+                    xcom.set_op(2);
+                ++i;
+            }
+            else if(m == "|")
+            {
+                if(i+1 < s.size() && s.at(i+1) == "|")
+                    xcom.set_op(3);
+                ++i;
+            }
 
-    return commandVector;
+            //add it.
+            c.push_back(xcom);
+            xcom.clear();
+        }
+        else
+            xcom.push_back(s.at(i));
+    }   
+    
+    //push into command vector if the command has something in it.
+    if(xcom.empty() == false)
+        c.push_back(xcom);    
+
+    return;
 }
+
+void execute_commands(const vector<Command> &v, bool &result)
+{
+    //nothing to execute.
+    if(v.size() == 0)
+        return;
+
+    //start the process.
+    for(unsigned int i = 0; i < v.size(); ++i)
+    {
+        if(i == 0)
+        {
+            execute(v.at(i).get_vector(),result);
+        }
+        else if(i >= 1)
+        {
+            if(v.at(i-1).get_op() == 1 && result == true)
+                execute(v.at(i).get_vector(),result);
+            else if(v.at(i-1).get_op() == 2 && result == true)
+                execute(v.at(i).get_vector(),result);
+            else if(v.at(i-1).get_op() == 3 && result == false)
+                execute(v.at(i).get_vector(),result);
+        }
+    }
+
+    return;
+}
+
 
