@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <queue>
+
+//function name goes here.
 #include <sys/stat.h>
 
 //getlogin() and gethostname().
@@ -141,28 +143,21 @@ int main()
         trim(input);
 
         //testing parse.
-        //cout << "Testing parse" << endl;
+        cout << "Testing parse" << endl;
 
         //parse
         parseInput(input,parseIn);
-        //display_vector(parseIn);
+        display_vector(parseIn);
 
         //create them commands.
         create_commands(parseIn,comVector);
 
-        //display.
-        /*
-        for(unsigned int i = 0; i < comVector.size(); ++i)
-        {
-            comVector.at(i).display();
-            cout << endl;
-        }
-        */
-        
         //set to true.
         *execRes = true;
         //cout << "initialize to true: " << *execRes << endl;
+  
 
+        cout << "starting execute" << endl;
         //execute that stuff you know?
         execute_commands(comVector,*execRes);
 
@@ -247,7 +242,7 @@ void parseInput(string s, vector<string> &v)
     replace_char(s,' ','*');
 
     //create boost magic function.
-    char_separator<char> sep(" ;||&&(){}", ";||&&()[]",keep_empty_tokens);
+    char_separator<char> sep(" ;||&&()[]", ";||&&()[]",keep_empty_tokens);
 
     //create boost magic holder thingy.
     tokenizer< char_separator<char> > cm(s,sep);
@@ -444,7 +439,7 @@ string remove_char(const string &s, char c)
     return t;
 }
 
-//Perfect
+//Perfectly useless.
 int is_connector(string s)
 {
     if(s == ";")
@@ -582,7 +577,7 @@ void create_commands(const vector<string> &s, vector<Command> &c)
 {
     //temp variable.
     Command xcom;
-    
+
     //make commands and push that into command vector.
     for(unsigned int i = 0; i < s.size(); ++i)
     {
@@ -629,6 +624,8 @@ void execute_commands(const vector<Command> &v, bool &result)
     if(v.size() == 0)
         return;
 
+    cout << "executing commands" << endl;
+
     //start the process.
     for(unsigned int i = 0; i < v.size(); ++i)
     {
@@ -646,6 +643,8 @@ void execute_commands(const vector<Command> &v, bool &result)
                 execute(v.at(i).get_vector(),result);
         }
     }
+
+    cout << "finished executing commands" << endl;
 
     return;
 }
