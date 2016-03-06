@@ -25,6 +25,14 @@ class Command
                 vs.push_back(v.at(i));
         }
 
+        Command(const Command &c)
+            : op(c.get_op())
+        {
+            vs = c.get_vector();
+        }
+    
+        ~Command() {}
+
         //add to vector of strings.
         void push_back(string s)
         {
@@ -33,7 +41,7 @@ class Command
         }
 
         //access vs but does not modify.
-        string at(int i)
+        string at(int i) const
         {
             unsigned int it = i;
             if(it >= vs.size() || it < 0)
@@ -42,7 +50,7 @@ class Command
         }
 
         //look up size of vs.
-        int size()
+        int size() const
         {
             return vs.size();
         }
@@ -56,7 +64,7 @@ class Command
         void display() const
         {
             cout << "OP: " << op << endl;
-
+            
             if(vs.size() != 0)
                 for(unsigned int i = 0; i < vs.size(); ++i)
                     cout << i+1 << ": " << vs.at(i) << endl;
