@@ -46,7 +46,7 @@ int find_char_amount(const string s,char c);
 void remove_comment(string &s);
 
 //removes char in string.
-void remove_char(string &s, char c);
+string remove_char(const string &s, char c);
 
 //checks if string passed in contains a flag
 bool isFlag(string f);
@@ -141,16 +141,37 @@ void execute(const vector<string> &s)
                 exit(0);
     
     //c-string to hold command.
-    char* args[2048];
-    
+    char* args[128];
+
+    int count = 0;
+
+    cout << endl;
     //place, remove comments and convert commands.
     for(unsigned int i = 0; i < s.size(); ++i)
     {
-        string temp = s.at(i);
-        remove_char(temp,'\"');
-        args[i] = (char*)temp.c_str();
+       // string temp = remove_char(s.at(i),'\"');
+
+        //cout << "(char*)temp.c_str(): " << (char*)temp.c_str() << endl;
+        cout << "s.at(i): " << s.at(i) << endl;    
+
+        args[i] = (char*)s.at(i).c_str();
+        //args[i] = (char*)temp.c_str();
+        count++;
+
+        //cout << "temp after: " << temp << endl;
+        cout << "args at " << i << ": " << args[i] << endl << endl;
     }
-    args[s.size()] = NULL;
+    cout << "array before: " << endl;
+    for(int i = 0; i < count; ++i)
+        cout << args[i] << endl;
+    cout << endl;
+
+    args[s.size()] = '\0';
+
+    cout << "array after: " << endl;
+    for(int i = 0; i < count; ++i)
+        cout << args[i] << endl;
+    cout << endl;
 
     //creates fork process.
     pid_t pid = fork();
@@ -182,6 +203,7 @@ void execute(const vector<string> &s)
         }
     }
    
+
     return;
 }
 
@@ -229,7 +251,6 @@ void replace_char(string &s, char o, char r)
                 s.at(i) = r;
 
         return;
-
     }
 
     //no quotes.
@@ -363,9 +384,11 @@ void remove_comment(string &s)
 
 int find_char_amount(const string s, char c)
 {
+    //nothing there.
     if(s.find(c) == string::npos)
         return 0;
 
+    //start counting.
     int count = 0;
     for(unsigned int i = 0; i < s.size(); ++i)
         if(s.at(i) == c)
@@ -374,24 +397,21 @@ int find_char_amount(const string s, char c)
 
 }
 
-void remove_char(string &s, char c)
+string remove_char(const string &s, char c)
 {
     //if not there then just return.
     if(s.find(c) == string::npos)
-        return;
+       return s;
     
     //start empty.
-    string temp = "";
+    string t = "";
 
     //add everything thats not what we dont want.
     for(unsigned int i = 0; i < s.size(); ++i)
         if(s.at(i) != c)
-            temp += s.at(i);
+            t += s.at(i);
 
-    //transfer to s.
-    s = temp;
-
-    return;
+    return t;
 }
 
 int is_connector(string s)
@@ -407,8 +427,10 @@ int is_connector(string s)
 }
 
 bool isFlag(string f)
-{	//default list of possible flags
+{
+	//default list of possible flags
 	string flags = "-e -d -f";
+
 	//see if string is one of the flags
 	if (flags.find(f) != string::npos)
 		return true;

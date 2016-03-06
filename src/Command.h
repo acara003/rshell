@@ -33,7 +33,7 @@ class Command
         }
 
         //access vs but does not modify.
-        string at(int i) const
+        string at(int i)
         {
             unsigned int it = i;
             if(it >= vs.size() || it < 0)
@@ -45,6 +45,11 @@ class Command
         int size()
         {
             return vs.size();
+        }
+
+        vector<string> get_vector() const
+        {
+            return vs;
         }
 
         //display vs and op.
