@@ -468,8 +468,7 @@ bool isFlag(string f)
 	return false;
 }
 
-/*
-bool test(vector<string> &commands, vector<strings> &command_list)
+bool test(vector<string> &commands, vector<string> &command_list)
 {	
 	//defaults to "-e"
 	string flag = "-e";
@@ -480,14 +479,14 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 	queue<string> coms;
 	for (unsigned int i = 0; i < commands.size(); i++)
 	{
-		coms.push_back(commands.at(i));
+		coms.push(commands.at(i));
 	}
 
 	//was a bracket used for the test command?
 	bool bracketUsed = false;
 
 	//set if a bracket was used
-	if(coms.front() == "[";
+	if(coms.front() == "[")
 		bracketUsed = true;
 	
 	//remove the first part of the command regardless of whether it's "test" or "["
@@ -497,7 +496,7 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 	{
 		flag = coms.front();
 		//now we have the flag for the test
-		coms.pop()
+		coms.pop();
 	}
 	
 	//if there's another flag attempt then it's broken
@@ -557,10 +556,10 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 	{
 		if(S_ISREG(s_thing.st_mode))
 		{
-			return false
+			return false;
 		} else
 		{
-			return true
+			return true;
 		}
 	}
 
@@ -572,12 +571,12 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 			return false;
 		} else
 		{
-			return true
+			return true;
 		}
 	}
 	//Obviously something went wrong if you got here
-	return true
-}*/
+	return true;
+}
 
 void create_commands(const vector<string> &s, vector<Command> &c)
 {
