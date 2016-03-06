@@ -444,7 +444,7 @@ string remove_char(const string &s, char c)
     return t;
 }
 
-//uselss.
+//Perfect
 int is_connector(string s)
 {
     if(s == ";")
@@ -468,7 +468,7 @@ bool isFlag(string f)
 	return false;
 }
 
-bool test(vector<string> &commands, vector<string> &command_list)
+bool test(vector<string> &commands, vector<char*> &command_list)
 {	
 	//defaults to "-e"
 	string flag = "-e";
@@ -492,7 +492,7 @@ bool test(vector<string> &commands, vector<string> &command_list)
 	//remove the first part of the command regardless of whether it's "test" or "["
 	coms.pop();
 	
-	if (isTestFlag(coms.front()))
+	if (isFlag(coms.front()))
 	{
 		flag = coms.front();
 		//now we have the flag for the test
@@ -500,7 +500,7 @@ bool test(vector<string> &commands, vector<string> &command_list)
 	}
 	
 	//if there's another flag attempt then it's broken
-	if (coms.front().at(0) == "-")
+	if (coms.front().at(0) == '-')
 	{
 		cout << "ERROR: incorrect flags" << endl;
 		
@@ -513,11 +513,11 @@ bool test(vector<string> &commands, vector<string> &command_list)
 	}
 
 	// if the first part of the path is a "/" remove it (that way it can't mess up)
-	if(coms.front().at(0) == "/")
+	if(coms.front().at(0) == '/')
 		coms.front().substr(1, coms.front().size() - 1);
 	
 	//make a new c_string to hold the file path
-	char *filePath = new char[coms.front.size()];
+	char *filePath = new char[coms.front().size()];
 	
 	//copy it on over from the command vector
 	strcpy(filePath, coms.front().c_str());
