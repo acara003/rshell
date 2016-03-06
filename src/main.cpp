@@ -496,10 +496,59 @@ bool isFlag(string f)
 	if (flags.find(f) != string::npos)
 		return true;
 	return false;
-}
+}://auth.ucr.edu/cas/login?service=https:%2F%2Filearn.ucr.edu%2Fwebapps%2Fbb-auth-provider-cas-bb_bb60%2Fexecute%2FcasLogin%3Fcmd%3Dlogin%26authProviderId%3D_102_1%26redirectUrl%3Dhttps%253A%252F%252Filearn.ucr.edu%252F%26sessionIdForLogout%3D2DDBDC4D944B971F31EE9EA703BD5CE8include <iostream>
+#include <cstdlib>
+#include <vector>
+#include <stdio.h>
+#include <sstream>
+#include <algorithm>
+#include <string>
 
-/*
-bool test(vector<string> &commands, vector<strings> &command_list)
+#include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#include "Com.h"
+
+#include "boost/algorithm/string.hpp"
+#include "boost/tokenizer.hpp"
+#include "boost/foreach.hpp"
+
+using namespace std;
+using namespace boost;
+
+void execute(char* args[],bool &res);
+
+char* convert(const vector<string> &v);
+
+Com transfer(vector<string> &v,int x);
+
+void parseInput(string input, vector<string> &commands);
+
+int main()
+{
+
+	char* login = getlogin();
+	bool login_check = true;
+	if((!login) != 0)
+	{
+		login_check = false;
+		perror("Error could not retrieve login name.");
+	}
+
+	char host[150];
+	bool host_check = true;
+	if(gethostname(host,sizeof(host)) != 0)
+	{
+		host_check = false;
+		perror("Error could not retrieve host name.");
+	}
+
+	if(login_check == false || host_check == false)
+
+
+bool test(vector<string> &commands, vector<string> &command_list)
 {	
 	//defaults to "-e"
 	string flag = "-e";
@@ -510,14 +559,14 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 	queue<string> coms;
 	for (unsigned int i = 0; i < commands.size(); i++)
 	{
-		coms.push_back(commands.at(i));
+		coms.push(commands.at(i));
 	}
 
 	//was a bracket used for the test command?
 	bool bracketUsed = false;
 
 	//set if a bracket was used
-	if(coms.front() == "[";
+	if(coms.front() == "[")
 		bracketUsed = true;
 	
 	//remove the first part of the command regardless of whether it's "test" or "["
@@ -527,7 +576,7 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 	{
 		flag = coms.front();
 		//now we have the flag for the test
-		coms.pop()
+		coms.pop();
 	}
 	
 	//if there's another flag attempt then it's broken
@@ -587,10 +636,10 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 	{
 		if(S_ISREG(s_thing.st_mode))
 		{
-			return false
+			return false;
 		} else
 		{
-			return true
+			return true;
 		}
 	}
 
@@ -602,12 +651,12 @@ bool test(vector<string> &commands, vector<strings> &command_list)
 			return false;
 		} else
 		{
-			return true
+			return true;
 		}
 	}
 	//Obviously something went wrong if you got here
-	return true
-}*/
+	return true;
+}
 
 void create_commands(const vector<string> &s, vector<Command> &c)
 {
