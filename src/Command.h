@@ -5,28 +5,25 @@ using namespace std;
 
 class Command
 {
-    private:
+    protected:
         vector<string> vs;
         int op;
     public:
         Command() : op(-1) {};
     
-        Command(const vector<string> &v)
-            : op(-1)
+        Command(const vector<string> &v) : op(-1)
         {
             for(unsigned int i = 0; i < v.size(); ++i)
                 vs.push_back(v.at(i));
         }
 
-        Command(const vector<string> &v, int op)
-            : op(op)
+        Command(const vector<string> &v, int op) : op(op)
         {
             for(unsigned int i = 0; i < v.size(); ++i)
                 vs.push_back(v.at(i));
         }
 
-        Command(const Command &c)
-            : op(c.get_op())
+        Command(const Command &c) : op(c.get_op())
         {
             vs = c.get_vector();
         }
@@ -105,6 +102,79 @@ class Command
             return false;
         }
 
+        bool is_pcom()
+        {
+            return false;
+        }
+
 };
+
+class Pcommand : public Command
+{
+    private:
+        vector<Command*> vc;
+        bool lastResult;
+    public:
+        Pcommand() : Command(), lastResult(true) {}
+
+        Pcommand(const vector<Command*> &v) : Command(), lastResult(true)
+        {
+            for(unsigned int i = 0; i < v.size(); ++i)
+                vc.push_back(v.at(i));
+        }
+
+        Pcommand(const vector<Command*> &v, bool res) : Command(), lastResult(res)
+        {
+            for(unsigned int i = 0; i < v.size(); ++i)
+                vc.push_back(v.at(i));
+        }
+
+        //Pcommand(const Pcommand p) : Command(p), lastResult(p.get_result())
+        
+        bool get_result() const
+        {
+            return lastResult;
+        }
+        
+        void set_result(bool res)
+        {
+            lastResult = res;
+            return;
+        }
+
+        void push_back(Command com)
+        {
+            vc.push_back(new Command(com));
+            return;
+        }
+        
+        Command at(int pos) const
+        {
+            unsigned int i = pos;
+            if(i >= vc.size())
+            {
+                cout << "ERROR: out of range" << endl;
+                return *vc.at(i);
+            }
+        }
+
+        bool is_empty()
+        {
+            if(vc.size() == 0)
+                return true;
+            return false;
+        }
+
+        vector<Command*> get_vector() const
+        {
+            return vc;
+        }
+        
+        bool is_pcom()
+        {
+            return true;
+        }
+
+};  
 
 #endif
