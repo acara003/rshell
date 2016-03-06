@@ -35,6 +35,12 @@ class Command
             s = c.get_vector();
         }
 
+        Command(const vector<Command*> &v) : op(-1) {
+            if(v.size() != 0)
+                for(unsigned int i = 0; i < v.size(); ++i)
+                    this->v.push_back(v.at(i));
+        }
+
         virtual vector<string> get_vector() const {
             return s;
         }
@@ -105,27 +111,45 @@ class Command
 
 };
 
-class normal : public Command
+class Normal : public Command
 {
     private:
-
+               
     public:
+        Normal() : Command() {}
+        
+        Normal(const Command &c) : Command(c) {}
+
+        Normal(const vector<string> &s) : Command(s) {}
+
+        Normal(int op) : Command(op) {}
+
+        Normal(const vector<string> &s, int op) : Command(s,op) {}    
+    
         int type() { return 1; }
 };
 
-class multi : public Command
+class Multi : public Command
 {
     private:
 
     public:
+        Multi() : Command() {}
+        
+        Multi(const vector<Command*> &v) : Command(v) {}
+
         int type() { return 2; }
 };
 
-class test : public Command
+class Test : public Command
 {
     private:
     
     public:
+        Test() : Command() {}
+        
+        Test(const vector<Command*> &v) : Command(v) {}
+
         int type() { return 3; }
 };
 
