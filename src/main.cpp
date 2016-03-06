@@ -571,10 +571,11 @@ bool test(vector<string> &commands, vector<char*> &command_list)
 	return true;
 }
 
+
 void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
 {
     //temp variable.
-    Command xcom;
+    Normal xcom;
 
     //make commands and push that into command vector.
     for(unsigned int i = 0; i < s.size(); ++i)
@@ -600,38 +601,55 @@ void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
                     xcom.set_op(3);
                 ++i;
             }
-            else if(m == "(")
-            {
-                vector<string> smalls;
-                vector<Command*> bigs;                
-
-                //copy.
-                for(unsigned int j = i; j < s.size(); ++j)
-                    smalls.push_back(s.at(j));
-                
-                create_commands(smalls,bigs,flagNum + 1);
-                
-                c.push_back(new Pcommand(bigs));
-            }
-            else if(m == ")" && flagNum != 0 )
-            {
-                return;
-            }
 
             //add it.
-            c.push_back(new Command(xcom));
+            c.push_back(new Normal(xcom));
             xcom.clear();
         }
+/*        else if(m == "(")
+        {
+            vector<string> smalls;
+            vector<Command*> bigs;
+
+            //copy.
+            for(unsigned int j = i; j < s.size(); ++j)
+            {    
+                smalls.push_back(s.at(j));
+                if(s.at(i) == "m")
+                {
+                    i = j;
+                    break;
+                }
+            }
+
+            create_commands(smalls,bigs,flagNum + 1);
+            c.push_back(new Pcommand(bigs));
+        }
+        else if(m == ")" && flagNum != 0)
+        {
+            return;
+        }
+        else if(m == "[")
+        {
+
+        }
+        else if(m == "]")
+        {
+    
+        }*/
         else
             xcom.push_back(s.at(i));
     }   
     
     //push into command vector if the command has something in it.
     if(xcom.empty() == false)
-        c.push_back(new Command(xcom));    
+        c.push_back(new Normal(xcom));    
 
     return;
 }
+
+
+
 
 void execute_commands(const vector<Command*> &v, bool &result)
 {
@@ -642,6 +660,10 @@ void execute_commands(const vector<Command*> &v, bool &result)
     //start the process.
     for(unsigned int i = 0; i < v.size(); ++i)
     {
+        //if(v.at(i)->type() == 2)
+        //{
+        //    execute_commands(v.at(i)->grab_vector(),result);
+        //}
         if(i == 0)
         {
             execute(v.at(i)->get_vector(),result);
@@ -659,5 +681,6 @@ void execute_commands(const vector<Command*> &v, bool &result)
 
     return;
 }
+
 
 
