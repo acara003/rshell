@@ -191,36 +191,6 @@ void execute(const vector<string> &s, bool &result)
     //c-string to hold command.
     char* args[128];
 
-    int count = 0;
-
-    cout << endl;
-    //place, remove comments and convert commands.
-    for(unsigned int i = 0; i < s.size(); ++i)
-    {
-       // string temp = remove_char(s.at(i),'\"');
-
-        //cout << "(char*)temp.c_str(): " << (char*)temp.c_str() << endl;
-        cout << "s.at(i): " << s.at(i) << endl;    
-
-        args[i] = (char*)s.at(i).c_str();
-        //args[i] = (char*)temp.c_str();
-        count++;
-
-        //cout << "temp after: " << temp << endl;
-        cout << "args at " << i << ": " << args[i] << endl << endl;
-    }
-    cout << "array before: " << endl;
-    for(int i = 0; i < count; ++i)
-        cout << args[i] << endl;
-    cout << endl;
-
-    args[s.size()] = '\0';
-
-    cout << "array after: " << endl;
-    for(int i = 0; i < count; ++i)
-        cout << args[i] << endl;
-    cout << endl;
-    //cout << endl;
     //place, remove comments and convert commands.
     for(unsigned int i = 0; i < s.size(); ++i)
     {
