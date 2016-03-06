@@ -57,10 +57,10 @@ string remove_char(const string &s, char c);
 bool isFlag(string f);
 
 //pass in vector of string and vector of Commands and populates the second vector.
-void create_commands(const vector<string> &s, vector<Command> &c);
+void create_commands(const vector<string> &s, vector<Command*> &c, int flagNum);
 
 //perform execution.
-void execute_commands(const vector<Command> &v, bool &result);
+void execute_commands(const vector<Command*> &v, bool &result);
 
 //result of execution.
 static bool *execRes;
@@ -116,7 +116,7 @@ int main()
     vector<string> parseIn;
 
     //hold all the Commands.
-    vector<Command> comVector;
+    vector<Command*> comVector;
 
     while(true)
     {
@@ -143,21 +143,19 @@ int main()
         trim(input);
 
         //testing parse.
-        cout << "Testing parse" << endl;
+        //cout << "Testing parse" << endl;
 
         //parse
         parseInput(input,parseIn);
-        display_vector(parseIn);
+        //display_vector(parseIn);
 
         //create them commands.
-        create_commands(parseIn,comVector);
+        create_commands(parseIn,comVector,0);
 
         //set to true.
         *execRes = true;
         //cout << "initialize to true: " << *execRes << endl;
-  
 
-        cout << "starting execute" << endl;
         //execute that stuff you know?
         execute_commands(comVector,*execRes);
 
@@ -573,7 +571,7 @@ bool test(vector<string> &commands, vector<char*> &command_list)
 	return true;
 }
 
-void create_commands(const vector<string> &s, vector<Command> &c)
+void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
 {
     //temp variable.
     Command xcom;
@@ -602,9 +600,26 @@ void create_commands(const vector<string> &s, vector<Command> &c)
                     xcom.set_op(3);
                 ++i;
             }
+            else if(m == "(")
+            {
+                vector<string> smalls;
+                vector<Command*> bigs;                
+
+                //copy.
+                for(unsigned int j = i; j < s.size(); ++j)
+                    smalls.push_back(s.at(j));
+                
+                create_commands(smalls,bigs,flagNum + 1);
+                
+                c.push_back(new Pcommand(bigs));
+            }
+            else if(m == ")" && flagNum != 0 )
+            {
+                return;
+            }
 
             //add it.
-            c.push_back(xcom);
+            c.push_back(new Command(xcom));
             xcom.clear();
         }
         else
@@ -613,38 +628,34 @@ void create_commands(const vector<string> &s, vector<Command> &c)
     
     //push into command vector if the command has something in it.
     if(xcom.empty() == false)
-        c.push_back(xcom);    
+        c.push_back(new Command(xcom));    
 
     return;
 }
 
-void execute_commands(const vector<Command> &v, bool &result)
+void execute_commands(const vector<Command*> &v, bool &result)
 {
     //nothing to execute.
     if(v.size() == 0)
         return;
-
-    cout << "executing commands" << endl;
 
     //start the process.
     for(unsigned int i = 0; i < v.size(); ++i)
     {
         if(i == 0)
         {
-            execute(v.at(i).get_vector(),result);
+            execute(v.at(i)->get_vector(),result);
         }
         else if(i >= 1)
         {
-            if(v.at(i-1).get_op() == 1 && result == true)
-                execute(v.at(i).get_vector(),result);
-            else if(v.at(i-1).get_op() == 2 && result == true)
-                execute(v.at(i).get_vector(),result);
-            else if(v.at(i-1).get_op() == 3 && result == false)
-                execute(v.at(i).get_vector(),result);
+            if(v.at(i-1)->get_op() == 1 && result == true)
+                execute(v.at(i)->get_vector(),result);
+            else if(v.at(i-1)->get_op() == 2 && result == true)
+                execute(v.at(i)->get_vector(),result);
+            else if(v.at(i-1)->get_op() == 3 && result == false)
+                execute(v.at(i)->get_vector(),result);
         }
     }
-
-    cout << "finished executing commands" << endl;
 
     return;
 }
