@@ -90,7 +90,7 @@ class Command
         }
 
         //see if object is empty.
-        bool empty()
+        bool empty() const
         {
             if(op == -1 && vs.size() == 0)
                 return true;
