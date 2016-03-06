@@ -628,14 +628,26 @@ void execute_commands(const vector<Command> &v, bool &result)
     if(v.size() == 0)
         return;
 
-    //testing.
-    cout << "result before: " << result <<  endl;    
+    //start the process.
+    for(unsigned int i = 0; i < v.size(); ++i)
+    {
+        if(i == 0)
+        {
+            execute(v.at(i).get_vector(),result);
+        }
+        else if(i >= 1)
+        {
+            if(v.at(i-1).get_op() == 1 && result == true)
+                execute(v.at(i).get_vector(),result);
+            else if(v.at(i-1).get_op() == 2 && result == true)
+                execute(v.at(i).get_vector(),result);
+            else if(v.at(i-1).get_op() == 3 && result == false)
+                execute(v.at(i).get_vector(),result);
+        }
 
-    //execute commands.
-    execute(v.at(0).get_vector(),result);
-
-    //testing.
-    cout << "result after: " << result << endl;
+        //testing.
+        cout << i << ": result: " << result << endl;
+    }
 
     return;
 }
