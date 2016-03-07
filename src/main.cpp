@@ -70,7 +70,6 @@ static bool *execRes;
 
 int main()
 {
-
     //lets the bool come back from the shadow realm.
     execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
     PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
@@ -248,6 +247,9 @@ void parseInput(string s, vector<string> &v)
 
     //replace spaces.
     replace_char(s,' ','*');
+    replace_char(s,'&','-');
+    replace_char(s,'|','^');
+    replace_char(s,';','%');
 
     //create boost magic function.
     char_separator<char> sep(" ;||&&()[]", ";||&&()[]",keep_empty_tokens);
@@ -262,6 +264,9 @@ void parseInput(string s, vector<string> &v)
             //fix string.
             string temp_string = *it;
             replace_char(temp_string,'*',' ');
+            replace_char(temp_string,'-','&');
+            replace_char(temp_string,'^','|');
+            replace_char(temp_string,'%',';');
             v.push_back(temp_string);
         }
 
@@ -661,7 +666,7 @@ void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
                     {
                         hold = j;
                         break;
-                    }			return;
+                    }
                     copyFlag = false;
                 }
                 
@@ -843,12 +848,21 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
             {
                 //vector to modify.
                 vector<string> sashaAgainIsLazy = v.at(i)->get_vector();            
-    
-                //run test.
-                test(sashaAgainIsLazy, result); 
+                
+                if(before == 2 && result == true)
+                {
+                    //run test.
+                    test(sashaAgainIsLazy, result); 
+                }
+                else if(before == 3 && result == false)
+                {
+                    test(sashaAgainIsLazy, result);
+                }
+                else
+                    test(sashaAgainIsLazy, result);
                 
                 //testing
-                cout << "result: " << result << endl;
+                //cout << "result: " << result << endl;
             }
             else
             {    
@@ -879,14 +893,24 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
             }
             else if(v.at(i)->type() == 3)
             {
+        
                 //set up vector to modify.
                 vector<string> sashaIsLazy = v.at(i)->get_vector();
                 
-                //test that stuff.
-                test(sashaIsLazy, result);
-
+                if(before == 2 && result == true)        
+                {
+                    //test that stuff.
+                    test(sashaIsLazy, result);
+                }
+                else if(before == 3 && result == false)
+                {
+                    test(sashaIsLazy, result);
+                }
+                else
+                    test(sashaIsLazy, result);
+                
                 //test.
-                cout << "result: " << endl;
+                //cout << "result: " << result << endl;
 
             }
             else
