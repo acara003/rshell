@@ -31,6 +31,7 @@
 using namespace std;
 using namespace boost;
 
+//run the test function
 void test(vector<string> &commands, bool &b);
 
 //execute command.
