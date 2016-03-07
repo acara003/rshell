@@ -70,19 +70,6 @@ static bool *execRes;
 
 int main()
 {
-	vector<string> v;
-	v.push_back("test");
-	v.push_back("src");
-	bool poop = false;
-	test(v, poop);
-	if (poop)
-	{
-		cout << "Yay" << endl;
-	}
-	else
-	{
-		cout << "Nay" << endl;
-	}
 
     //lets the bool come back from the shadow realm.
     execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
@@ -477,7 +464,6 @@ bool isFlag(string f)
 {
 	//default list of possible flags
 	string flags = "-e -d -f";
-
 	//see if string is one of the flags
 	if (flags.find(f) != string::npos)
 		return true;
@@ -543,7 +529,6 @@ void test(vector<string> &commands, bool &b)
 	{
 		coms.front() = coms.front().substr(1, coms.front().size() - 1);
 	}
-	cout << coms.front() << endl;
 
 	//make a new c_string to hold the file path
 	char *filePath = new char[coms.front().size()];
