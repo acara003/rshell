@@ -29,6 +29,8 @@
 using namespace std;
 using namespace boost;
 
+bool test(vector<string> &commands);
+
 //execute command.
 void execute(const vector<string> &s, bool &result);
 
@@ -65,6 +67,14 @@ static bool *execRes;
 
 int main()
 {
+	vector<string> s;
+	s.push_back("-e /file/path");
+	bool poop;
+	poop = test(s);
+	if(poop)
+	{
+		cout << "YAY" << endl;
+	}
     //lets the bool come back from the shadow realm.
     execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
     PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
@@ -468,8 +478,14 @@ bool isFlag(string f)
 	return false;
 }
 
-bool test(vector<string> &commands, vector<char*> &command_list)
+void test(vector<string> &commands, bool b)
 {	
+	vector<char*> command_list;
+	for (unsigned int i = 0; i < commands.size(); i++)
+	{
+		command_list.push_back((char*)commands.at(i).c_str());
+	}
+	
 	//defaults to "-e"
 	string flag = "-e";
 
@@ -481,7 +497,7 @@ bool test(vector<string> &commands, vector<char*> &command_list)
 	{
 		coms.push(commands.at(i));
 	}
-
+	
 	//was a bracket used for the test command?
 	bool bracketUsed = false;
 
@@ -498,10 +514,10 @@ bool test(vector<string> &commands, vector<char*> &command_list)
 		//now we have the flag for the test
 		coms.pop();
 	}
-	
 	//if there's another flag attempt then it's broken
 	if (coms.front().at(0) == '-')
 	{
+		cout << "got to this part" << endl;
 		cout << "ERROR: incorrect flags" << endl;
 		
 		//keep deleting from queue till the next command
@@ -509,9 +525,9 @@ bool test(vector<string> &commands, vector<char*> &command_list)
 		{
 			coms.pop();
 		}
-		return true;
+		return b = true;
+		
 	}
-
 	// if the first part of the path is a "/" remove it (that way it can't mess up)
 	if(coms.front().at(0) == '/')
 		coms.front().substr(1, coms.front().size() - 1);
@@ -543,12 +559,12 @@ bool test(vector<string> &commands, vector<char*> &command_list)
 	{	
 		//Yup it did
 		perror("ERROR: Coudn't get the stat");
-		return true;
+		return b = true;
 	}
 	//No it didn't so lets try out with "-e"
 	if (flag == "-e")
 	{
-		return false;
+		return b = false;
 	}
 	
 	//Try it out with "-f"
@@ -556,10 +572,10 @@ bool test(vector<string> &commands, vector<char*> &command_list)
 	{
 		if(S_ISREG(s_thing.st_mode))
 		{
-			return false;
+			return b = false;
 		} else
 		{
-			return true;
+			return b = true;
 		}
 	}
 
@@ -568,14 +584,14 @@ bool test(vector<string> &commands, vector<char*> &command_list)
 	{
 		if (S_ISDIR(s_thing.st_mode))
 		{
-			return false;
+			return b = false;
 		} else
 		{
-			return true;
+			return b = true;
 		}
 	}
 	//Obviously something went wrong if you got here
-	return true;
+	return b = true;
 }
 
 void create_commands(const vector<string> &s, vector<Command> &c)
