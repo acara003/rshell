@@ -54,6 +54,8 @@ To install and run rshell on your computer make sure you open the terminal and t
  
  -requires perfect syntax to work (otherwise it will throw errors)
  
+ -sometimes when you pull random lines from different files will be put into the source code. If it does not compile please let us know
+ 
 ### Installation
 To install and run rshell on your computer, open terminal and type the following commands:
 

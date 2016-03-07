@@ -70,21 +70,6 @@ static bool *execRes;
 
 int main()
 {
-	/*vector<string> v;
-	v.push_back("[");
-	v.push_back("-e");
-	v.push_back("]");
-	bool poop = false;
-	test(v, poop);
-
-	if(poop)
-	{
-		cout << "Yay" << endl;
-	} else
-	{
-		cout << "Nay" << endl;
-	}*/
-	
     //lets the bool come back from the shadow realm.
     execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
     PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
