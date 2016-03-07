@@ -70,6 +70,20 @@ static bool *execRes;
 
 int main()
 {
+	/*vector<string> v;
+	v.push_back("test");
+	v.push_back("-e");
+	bool poop = false;
+	test(v, poop);
+	if (poop)
+	{
+		cout << "Yay" << endl;
+	}
+	else
+	{
+		cout << "Nay" << endl;
+	}*/
+
     //lets the bool come back from the shadow realm.
     execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
     PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
@@ -446,7 +460,7 @@ string remove_char(const string &s, char c)
     return t;
 }
 
-//Perfectly useless.
+//Perfectly useful
 int is_connector(string s)
 {
     if(s == ";")
@@ -476,7 +490,7 @@ void test(vector<string> &commands, bool &b)
 	
 	//defaults to "-e"
 	string flag = "-e";
-
+	
 	struct stat s_thing;
 
 	//put everything into a queue for ease of use
@@ -502,6 +516,14 @@ void test(vector<string> &commands, bool &b)
 		//now we have the flag for the test
 		coms.pop();
 	}
+	
+	if (coms.size() == 0)
+	{
+		cout << "ERROR: No file path provided" << endl;
+		b = false;
+		return;
+	}
+
 	//if there's another flag attempt then it's broken
 	if (coms.front().at(0) == '-')
 	{
