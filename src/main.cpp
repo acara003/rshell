@@ -863,12 +863,21 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
             {
                 //vector to modify.
                 vector<string> sashaAgainIsLazy = v.at(i)->get_vector();            
-    
-                //run test.
-                test(sashaAgainIsLazy, result); 
+                
+                if(before == 2 && result == true)
+                {
+                    //run test.
+                    test(sashaAgainIsLazy, result); 
+                }
+                else if(before == 3 && result == false)
+                {
+                    test(sashaAgainIsLazy, result);
+                }
+                else
+                    test(sashaAgainIsLazy, result);
                 
                 //testing
-                cout << "result: " << result << endl;
+                //cout << "result: " << result << endl;
             }
             else
             {    
@@ -899,14 +908,24 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
             }
             else if(v.at(i)->type() == 3)
             {
+        
                 //set up vector to modify.
                 vector<string> sashaIsLazy = v.at(i)->get_vector();
                 
-                //test that stuff.
-                test(sashaIsLazy, result);
-
+                if(before == 2 && result == true)        
+                {
+                    //test that stuff.
+                    test(sashaIsLazy, result);
+                }
+                else if(before == 3 && result == false)
+                {
+                    test(sashaIsLazy, result);
+                }
+                else
+                    test(sashaIsLazy, result);
+                
                 //test.
-                cout << "result: " << endl;
+                //cout << "result: " << result << endl;
 
             }
             else
