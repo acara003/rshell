@@ -264,6 +264,9 @@ void parseInput(string s, vector<string> &v)
 
     //replace spaces.
     replace_char(s,' ','*');
+    replace_char(s,'&','-');
+    replace_char(s,'|','^');
+    replace_char(s,';','%');
 
     //create boost magic function.
     char_separator<char> sep(" ;||&&()[]", ";||&&()[]",keep_empty_tokens);
@@ -278,6 +281,9 @@ void parseInput(string s, vector<string> &v)
             //fix string.
             string temp_string = *it;
             replace_char(temp_string,'*',' ');
+            replace_char(temp_string,'-','&');
+            replace_char(temp_string,'^','|');
+            replace_char(temp_string,'%',';');
             v.push_back(temp_string);
         }
 
@@ -679,7 +685,7 @@ void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
                     {
                         hold = j;
                         break;
-                    }			return;
+                    }
                     copyFlag = false;
                 }
                 
