@@ -148,7 +148,7 @@ int main()
         cout << "$ ";    
 
         //placeholder to tell its the program.
-        cout << " (program) ";
+        //cout << " (program) ";
 
         //geting input as a string.
         getline(cin,input);
