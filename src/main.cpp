@@ -871,15 +871,32 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
                 if(before == 2 && result == true)
                 {
                     //run test.
-                    test(sashaAgainIsLazy, result); 
+                    test(sashaAgainIsLazy, result);
+                    
+                    if(result == true)
+                        cout << "(true)" << endl;
+                    else
+                        cout << "(false)" << endl; 
                 }
                 else if(before == 3 && result == false)
                 {
                     test(sashaAgainIsLazy, result);
+
+                    if(result == true)
+                        cout << "(true)" << endl;
+                    else
+                        cout << "(false)" << endl; 
                 }
                 else
+                {
                     test(sashaAgainIsLazy, result);
-                
+                    
+                    if(result == true)
+                        cout << "(true)" << endl;
+                    else
+                        cout << "(false)" << endl; 
+
+                }
                 //testing
                 //cout << "result: " << result << endl;
             }
@@ -920,14 +937,32 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
                 {
                     //test that stuff.
                     test(sashaIsLazy, result);
+                    
+                    if(result == true)
+                        cout << "(true)" << endl;
+                    else
+                        cout << "(false)" << endl; 
+
                 }
                 else if(before == 3 && result == false)
                 {
                     test(sashaIsLazy, result);
+                    
+                    if(result == true)
+                        cout << "(true)" << endl;
+                    else
+                        cout << "(false)" << endl; 
+
                 }
                 else
+                {
                     test(sashaIsLazy, result);
-                
+
+                    if(result == true)
+                        cout << "(true)" << endl;
+                    else
+                        cout << "(false)" << endl; 
+                }
                 //test.
                 //cout << "result: " << result << endl;
 
