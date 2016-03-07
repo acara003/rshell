@@ -691,11 +691,106 @@ void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
         }
         else if(m == "[")
         {
-        
+            //hold test stuff.
+            vector<string> words;
+            
+            //know when to stop copying.
+            bool flagCopy = false;
+
+            //op man.
+            int fop = -1;
+
+            //start your copying.
+            while(i < s.size())
+            {
+                if(flagCopy == false)
+                {
+                    words.push_back(s.at(i));
+                    if(s.at(i) == "]")
+                    {
+                        flagCopy = true;
+                    }
+                }
+                
+                if(s.at(i) == ";")
+                {
+                    fop = 1;
+                    break;
+                }
+                else if(s.at(i) == "&")
+                {
+                    if(i+1 < s.size() && s.at(i+1) == "&")
+                    {
+                        i++;
+                        fop = 2;
+                        break;
+                    }
+                }
+                else if(s.at(i) == "|")
+                {
+                    if(i+1 < s.size() && s.at(i+1) == "|")
+                    {
+                        i++;
+                        fop = 3;
+                        break;
+                    }
+                }
+                ++i;
+            }
+
+            //cout << "testing vector" << endl;
+            //display_vector(words);
+            //cout << "connector" << endl;
+            //cout << fop << endl;
+            
+            //add to vector.
+            c.push_back(new Test(words,fop));
         }
         else if(m == "test")
         {
-    
+            //hold words.
+            vector<string> placeString;
+
+            //op.
+            int ops = -1;
+
+            //start copying.
+            while(i < s.size())
+            {
+                if(s.at(i) == ";")
+                {
+                    ops = 1;
+                    break;
+                }
+                else if(s.at(i) == "&")
+                {   
+                    if(i+1 < s.size() && s.at(i+1) == "&")
+                    {
+                        i++;
+                        ops = 2;
+                        break;
+                    }
+                }
+                else if(s.at(i) == "|")
+                {
+                    if(i+1 < s.size() && s.at(i) == "|")
+                    {
+                        i++;
+                        ops = 3;
+                        break;
+                    }
+                }
+                else
+                    placeString.push_back(s.at(i));
+                ++i;
+            }
+
+            //cout << "testing vector" << endl;
+            //display_vector(placeString);
+            //cout << "connector: " << endl << ops << endl;
+
+            //add to vector.
+            c.push_back(new Test(placeString,ops));
         }
         else
         {
