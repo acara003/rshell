@@ -839,7 +839,14 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
             }
             else if(v.at(i)->type() == 3)
             {
-                cout << "place holder" << endl;
+                //vector to modify.
+                vector<string> sashaAgainIsLazy = v.at(i)->get_vector();            
+    
+                //run test.
+                test(sashaAgainIsLazy, result); 
+                
+                //testing
+                cout << "result: " << result << endl;
             }
             else
             {    
@@ -870,6 +877,14 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
             }
             else if(v.at(i)->type() == 3)
             {
+                //set up vector to modify.
+                vector<string> sashaIsLazy = v.at(i)->get_vector();
+                
+                //test that stuff.
+                test(sashaIsLazy, result);
+
+                //test.
+                cout << "result: " << endl;
 
             }
             else
