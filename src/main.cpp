@@ -31,7 +31,7 @@
 using namespace std;
 using namespace boost;
 
-bool test(vector<string> &commands);
+void test(vector<string> &commands, bool &b);
 
 //execute command.
 void execute(const vector<string> &s, bool &result);
@@ -69,14 +69,6 @@ static bool *execRes;
 
 int main()
 {
-	vector<string> s;
-	s.push_back("-e /file/path");
-	bool poop;
-	poop = test(s);
-	if(poop)
-	{
-		cout << "YAY" << endl;
-	}
     //lets the bool come back from the shadow realm.
     execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
     PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
@@ -477,13 +469,9 @@ bool isFlag(string f)
 	return false;
 }
 
-void test(vector<string> &commands, bool b)
+void test(vector<string> &commands, bool &b)
 {	
 	vector<char*> command_list;
-	for (unsigned int i = 0; i < commands.size(); i++)
-	{
-		command_list.push_back((char*)commands.at(i).c_str());
-	}
 	
 	//defaults to "-e"
 	string flag = "-e";
@@ -516,24 +504,33 @@ void test(vector<string> &commands, bool b)
 	//if there's another flag attempt then it's broken
 	if (coms.front().at(0) == '-')
 	{
-		cout << "got to this part" << endl;
-		cout << "ERROR: incorrect flags" << endl;
+		cout << "ERROR: Incorrect flags" << endl;
 		
 		//keep deleting from queue till the next command
 		while (!is_connector(coms.front()))
 		{
 			coms.pop();
 		}
-		return b = true;
-		
+		b = false;
+		return;
 	}
+
 	// if the first part of the path is a "/" remove it (that way it can't mess up)
 	if(coms.front().at(0) == '/')
-		coms.front().substr(1, coms.front().size() - 1);
-	
+	{
+		coms.front() = coms.front().substr(1, coms.front().size() - 1);
+	}
+	cout << coms.front() << endl;
+
 	//make a new c_string to hold the file path
 	char *filePath = new char[coms.front().size()];
 	
+	//Remove that last ] so it finds the path alright
+	if (bracketUsed)
+	{
+		coms.front() = coms.front().substr(0, coms.front().size() - 1);
+	}
+
 	//copy it on over from the command vector
 	strcpy(filePath, coms.front().c_str());
 	command_list.push_back(filePath);
@@ -558,12 +555,14 @@ void test(vector<string> &commands, bool b)
 	{	
 		//Yup it did
 		perror("ERROR: Coudn't get the stat");
-		return b = true;
+		b = false;
+			return;
 	}
 	//No it didn't so lets try out with "-e"
 	if (flag == "-e")
 	{
-		return b = false;
+		b = true;
+		return;
 	}
 	
 	//Try it out with "-f"
@@ -571,10 +570,12 @@ void test(vector<string> &commands, bool b)
 	{
 		if(S_ISREG(s_thing.st_mode))
 		{
-			return b = false;
+			b = true;
+			return;
 		} else
 		{
-			return b = true;
+			b =	false;
+			return;
 		}
 	}
 
@@ -583,16 +584,18 @@ void test(vector<string> &commands, bool b)
 	{
 		if (S_ISDIR(s_thing.st_mode))
 		{
-			return b = false;
+			b = true;
+			return;
 		} else
 		{
-			return b = true;
+			b = false;
+			return;
 		}
 	}
 	//Obviously something went wrong if you got here
-	return b = true;
+	b = false;
+	return;
 }
-
 
 void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
 {
@@ -655,7 +658,7 @@ void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
                     {
                         hold = j;
                         break;
-                    }
+                    }			return;
                     copyFlag = false;
                 }
                 
