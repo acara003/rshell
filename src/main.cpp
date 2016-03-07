@@ -918,7 +918,7 @@ void execute_commands(const vector<Command*> &v, bool &result, int before)
                     //cout << "|| before and result: " << result << endl;
                 }
             }
-            else if(./bin/rshell << EOFv.at(i)->type() == 3)
+            else if(v.at(i)->type() == 3)
             {
         
                 //set up vector to modify.
