@@ -111,6 +111,7 @@ class Command
 
 };
 
+//contains just simple commands.
 class Normal : public Command
 {
     private:
@@ -129,6 +130,7 @@ class Normal : public Command
         int type() { return 1; }
 };
 
+//contains paranthesis.
 class Multi : public Command
 {
     private:
@@ -151,6 +153,7 @@ class Multi : public Command
         }
 };
 
+//contains class command.
 class Test : public Command
 {
     private:
@@ -159,6 +162,8 @@ class Test : public Command
         Test() : Command() {}
         
         Test(const vector<Command*> &v) : Command(v) {}
+        
+        Test(const vector<string> &s, int op) : Command(s,op) {}
 
         int type() { return 3; }
 };
