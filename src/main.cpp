@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <queue>
+
+//function name goes here.
 #include <sys/stat.h>
 
 //getlogin() and gethostname().
@@ -57,10 +59,10 @@ string remove_char(const string &s, char c);
 bool isFlag(string f);
 
 //pass in vector of string and vector of Commands and populates the second vector.
-void create_commands(const vector<string> &s, vector<Command> &c);
+void create_commands(const vector<string> &s, vector<Command*> &c, int flagNum);
 
 //perform execution.
-void execute_commands(const vector<Command> &v, bool &result);
+void execute_commands(const vector<Command*> &v, bool &result, int before);
 
 //result of execution.
 static bool *execRes;
@@ -124,7 +126,7 @@ int main()
     vector<string> parseIn;
 
     //hold all the Commands.
-    vector<Command> comVector;
+    vector<Command*> comVector;
 
     while(true)
     {
@@ -158,23 +160,17 @@ int main()
         //display_vector(parseIn);
 
         //create them commands.
-        create_commands(parseIn,comVector);
+        create_commands(parseIn,comVector,0);
 
-        //display.
-        /*
-        for(unsigned int i = 0; i < comVector.size(); ++i)
-        {
-            comVector.at(i).display();
-            cout << endl;
-        }
-        */
-        
         //set to true.
         *execRes = true;
         //cout << "initialize to true: " << *execRes << endl;
 
+        //for(unsigned int i = 0; i < comVector.size(); ++i)
+            //comVector.at(i)->display();
+
         //execute that stuff you know?
-        execute_commands(comVector,*execRes);
+        execute_commands(comVector,*execRes,0);
 
         //clear vectors.
         parseIn.clear();
@@ -217,6 +213,9 @@ void execute(const vector<string> &s, bool &result)
     //creates fork process.
     pid_t pid = fork();
 
+    //if it fails then sets to fail but if not then its good.
+    result = true;
+
     if(pid == -1)
     {
         //fork didn't work.
@@ -257,7 +256,7 @@ void parseInput(string s, vector<string> &v)
     replace_char(s,' ','*');
 
     //create boost magic function.
-    char_separator<char> sep(" ;||&&(){}", ";||&&()[]",keep_empty_tokens);
+    char_separator<char> sep(" ;||&&()[]", ";||&&()[]",keep_empty_tokens);
 
     //create boost magic holder thingy.
     tokenizer< char_separator<char> > cm(s,sep);
@@ -454,7 +453,7 @@ string remove_char(const string &s, char c)
     return t;
 }
 
-//Perfect
+//Perfectly useless.
 int is_connector(string s)
 {
     if(s == ";")
@@ -594,11 +593,12 @@ void test(vector<string> &commands, bool b)
 	return b = true;
 }
 
-void create_commands(const vector<string> &s, vector<Command> &c)
+
+void create_commands(const vector<string> &s, vector<Command*> &c,int flagNum)
 {
     //temp variable.
-    Command xcom;
-    
+    Normal xcom;
+
     //make commands and push that into command vector.
     for(unsigned int i = 0; i < s.size(); ++i)
     {
@@ -625,21 +625,90 @@ void create_commands(const vector<string> &s, vector<Command> &c)
             }
 
             //add it.
-            c.push_back(xcom);
+            c.push_back(new Normal(xcom));
             xcom.clear();
         }
+        else if(m == "(")
+        {
+            //new string vector(forwards).
+            vector<string> smalls;
+            
+            //new command vector.
+            vector<Command*> bigs;
+
+            //flag to know when to start copying.
+            bool copyFlag = false;
+            
+            //new index of vector starting point.
+            int hold;
+            
+            //hold paranthesis.
+            for(unsigned int j = i + 1; j < s.size(); ++j)
+            {
+                if(s.at(j) == "(")
+                {
+                    copyFlag = true;
+                }   
+                else if(s.at(j) == ")")
+                {
+                    if(!copyFlag)
+                    {
+                        hold = j;
+                        break;
+                    }
+                    copyFlag = false;
+                }
+                
+                //push it really good.    
+                smalls.push_back(s.at(j));
+            }
+            
+            //testing.
+            //cout << "new vector" << endl;
+            //display_vector(smalls);
+            
+            //recursively make new commands.
+            create_commands(smalls,bigs,flagNum + 1);
+
+            //add to vector.
+            c.push_back(new Multi(bigs));
+
+            //test new commands.
+            //cout << "new command vector" << endl;
+            //for(unsigned int j = 0; j < bigs.size(); ++j)
+                //bigs.at(j)->display();           
+
+            //new index to start from.
+            i = hold;
+        }
+        else if(m == ")")
+        {
+            if(flagNum != 0)
+                return;
+        }
+        else if(m == "[")
+        {
+        
+        }
+        else if(m == "test")
+        {
+    
+        }
         else
-            xcom.push_back(s.at(i));
+        {
+            if(m != "[" || m != "]" || m != "(" || m != ")")
+                xcom.push_back(s.at(i));
+        }
     }   
     
     //push into command vector if the command has something in it.
     if(xcom.empty() == false)
-        c.push_back(xcom);    
+        c.push_back(new Normal(xcom));    
 
     return;
 }
 
-void execute_commands(const vector<Command> &v, bool &result)
+void execute_commands(const vector<Command*> &v, bool &result, int before)
 {
     //nothing to execute.
     if(v.size() == 0)
@@ -650,20 +719,85 @@ void execute_commands(const vector<Command> &v, bool &result)
     {
         if(i == 0)
         {
-            execute(v.at(i).get_vector(),result);
+            //starts with multiple
+            if(v.at(i)->type() == 2)
+            {
+                if(before == -1 || before == 0 || before == 1)
+                {
+                    execute_commands(v.at(i)->grab_vector(),result,before);
+                    //cout << "nothing before and result: " << result << endl;
+                }
+                else if(before == 2 && result == true)
+                {
+                    execute_commands(v.at(i)->grab_vector(),result,before);
+                    //cout << "&& before and result: " << result << endl;
+                }
+                else if(before == 3 && result == false)
+                {
+                    execute_commands(v.at(i)->grab_vector(),result,before);
+                    //cout << "|| before and result: " << result << endl;
+                }
+            }
+            else if(v.at(i)->type() == 3)
+            {
+                cout << "place holder" << endl;
+            }
+            else
+            {    
+                 execute(v.at(i)->get_vector(),result);
+                 //cout << "single result: " << result << endl;
+            }
         }
         else if(i >= 1)
         {
-            if(v.at(i-1).get_op() == 1 && result == true)
-                execute(v.at(i).get_vector(),result);
-            else if(v.at(i-1).get_op() == 2 && result == true)
-                execute(v.at(i).get_vector(),result);
-            else if(v.at(i-1).get_op() == 3 && result == false)
-                execute(v.at(i).get_vector(),result);
+            if(v.at(i)->type() == 2)
+            {
+                //cout << "before: " << v.at(i-1)->get_op() << endl;
+                if(before == -1 || before == 0 || before == 1)
+                {
+                    execute_commands(v.at(i)->grab_vector(),result,v.at(i-1)->get_op());
+                    //cout << "nothing before and result: " << result << endl;
+                }
+                else if(before == 2 && result == true)
+                {
+                    execute_commands(v.at(i)->grab_vector(),result,v.at(i-1)->get_op());
+                    //cout << "&& before and result: " << result << endl;
+                }
+                else if(before == 3 && result == false)
+                {
+                    execute_commands(v.at(i)->grab_vector(),result,v.at(i-1)->get_op());
+                    //cout << "|| before and result: " << result << endl;
+                }
+            }
+            else if(v.at(i)->type() == 3)
+            {
+
+            }
+            else
+            {
+                if(v.at(i-1)->get_op() == 1 && result == true)
+                {
+                    execute(v.at(i)->get_vector(),result);
+                    //cout << "; single result: " << result << endl;
+                }
+                else if(v.at(i-1)->get_op() == 2 && result == true)
+                {
+                    execute(v.at(i)->get_vector(),result);
+                    //cout << "& single result: " << result << endl;
+                }
+                else if(v.at(i-1)->get_op() == 3 && result == false)
+                {
+                    execute(v.at(i)->get_vector(),result);
+                    //cout << "| single result: " << result << endl;
+                }
+            }
         }
+        //set previous statement.
+        before = v.at(i)->get_op();
     }
 
     return;
 }
+
 
 
