@@ -70,6 +70,21 @@ static bool *execRes;
 
 int main()
 {
+	/*vector<string> v;
+	v.push_back("[");
+	v.push_back("-e");
+	v.push_back("]");
+	bool poop = false;
+	test(v, poop);
+
+	if(poop)
+	{
+		cout << "Yay" << endl;
+	} else
+	{
+		cout << "Nay" << endl;
+	}*/
+	
     //lets the bool come back from the shadow realm.
     execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
     PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
@@ -500,7 +515,6 @@ void test(vector<string> &commands, bool &b)
 	
 	//remove the first part of the command regardless of whether it's "test" or "["
 	coms.pop();
-	
 	if (isFlag(coms.front()))
 	{
 		flag = coms.front();
@@ -508,9 +522,8 @@ void test(vector<string> &commands, bool &b)
 		coms.pop();
 	}
 	
-	if (coms.size() == 0)
+	if (coms.size() == 0 || coms.front() == "]")
 	{
-		cout << "ERROR: No file path provided" << endl;
 		b = false;
 		return;
 	}
@@ -518,7 +531,6 @@ void test(vector<string> &commands, bool &b)
 	//if there's another flag attempt then it's broken
 	if (coms.front().at(0) == '-')
 	{
-		cout << "ERROR: Incorrect flags" << endl;
 		
 		//keep deleting from queue till the next command
 		while (!is_connector(coms.front()))
@@ -537,8 +549,6 @@ void test(vector<string> &commands, bool &b)
 
 	//make a new c_string to hold the file path
 	char *filePath = new char[coms.front().size()];
-	
-	//Remove that last ] so it finds the path alright
 
 	//copy it on over from the command vector
 	strcpy(filePath, coms.front().c_str());
