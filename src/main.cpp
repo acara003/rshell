@@ -70,9 +70,9 @@ static bool *execRes;
 
 int main()
 {
-	/*vector<string> v;
+	vector<string> v;
 	v.push_back("test");
-	v.push_back("-e");
+	v.push_back("src");
 	bool poop = false;
 	test(v, poop);
 	if (poop)
@@ -82,7 +82,7 @@ int main()
 	else
 	{
 		cout << "Nay" << endl;
-	}*/
+	}
 
     //lets the bool come back from the shadow realm.
     execRes = static_cast<bool *>(mmap(NULL, sizeof *execRes, 
@@ -549,15 +549,11 @@ void test(vector<string> &commands, bool &b)
 	char *filePath = new char[coms.front().size()];
 	
 	//Remove that last ] so it finds the path alright
-	if (bracketUsed)
-	{
-		coms.front() = coms.front().substr(0, coms.front().size() - 1);
-	}
 
 	//copy it on over from the command vector
 	strcpy(filePath, coms.front().c_str());
 	command_list.push_back(filePath);
-
+	
 	//moving along
 	coms.pop();
 	
@@ -566,7 +562,6 @@ void test(vector<string> &commands, bool &b)
 	{
 		coms.pop();
 	}
-	
 	//valuse for using the stat thingy
 	int current_stat;
 	
